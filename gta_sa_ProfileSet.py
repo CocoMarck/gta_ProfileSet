@@ -7,7 +7,7 @@ from pathlib import Path as pathlib
 import os, subprocess
 
 
-dir_main = os.path.dirname(__file__)
+dir_main = pathlib().absolute()
 
 exe_gta_sa = os.path.join(dir_main, 'gta_sa.exe')
 
@@ -24,8 +24,8 @@ if os.path.isfile( modloader_file ):
         option='ModeText',
         encoding="utf-8"
     )
-    with open( modloader_file, 'r', encoding='utf-8') as text:
-        pass#text_ini = text.read()
+    #with open( modloader_file, 'r', encoding='utf-8') as text:
+    #    pass#text_ini = text.read()
     #text_ini = Ignore_Comment(text=text_ini, comment=';')
 else:
     #print( 'No existe el archivo' )
