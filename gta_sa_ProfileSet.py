@@ -138,10 +138,6 @@ while loop:
         #    option_continue = False
         if option_continue == True:
             set_profile( profile=dict_profiles[option], text_ini=text_ini )
-            print(
-                dict_profiles[option],
-                f'{get_text("exec")} "{exe_gta_sa.replace(dir_main, "")}"'
-            )
             subprocess.Popen(exe_gta_sa)
             loop = False
         else:
