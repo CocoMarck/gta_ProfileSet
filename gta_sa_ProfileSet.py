@@ -1,4 +1,5 @@
-#from Modulos import Modulo_Language as lang
+from Modulos.Modulo_System import *
+from Modulos.Modulo_Files import *
 from Modulos.Modulo_Language import *
 from Modulos.Modulo_System import *
 from Modulos.Modulo_ShowPrint import *
@@ -15,7 +16,6 @@ dir_modloader = os.path.join( dir_main, 'modloader' )
 modloader_file = os.path.join( dir_modloader, 'modloader.ini' )
 
 
-print(modloader_file)
 if os.path.isfile( modloader_file ):
     #print('Existe el archivo')
 
@@ -86,10 +86,63 @@ def set_profile(profile=None, text_ini=None):
     else:
         return None
 
-#print(
-#    set_profile(profile='Default', text_ini=text_ini),
-#    type(text_ini)
-#)
+
+
+'''
+Obtener los mods del juego
+'''
+def get_mods_dirs(path=False):
+    # Devuelve en una lista las carpetas "main" en modloader
+    all_files = Files_List( files='*', path=dir_modloader, remove_path=False)
+    dirs = []
+    for file in all_files:
+        if os.path.isdir(file):
+            file_ready = file.replace(dir_modloader, '')
+            if get_system() == 'win':
+                file_ready = file_ready.replace( '\\', '')
+            else:
+                file_ready = file_ready.replace( '/', '')
+
+            if not file_ready.startswith('.'):
+                add = True
+            else:
+                add = False
+
+            if path == True:
+                file_ready = file
+
+
+            if add == True:
+                dirs.append( file_ready )
+    return dirs
+
+def get_mods_files():
+    import fnmatch
+    # Devuelve en una lista "archivos.asi" y "archivos.cs"
+    all_files_mods = get_mods_dirs(path=True)
+    other_files = []
+    for file_mod in all_files_mods:
+        for name_dir, dirs, files in os.walk(file_mod):
+            for file in files:
+                if (
+                    fnmatch.fnmatch(file, '*.asi') or
+                    fnmatch.fnmatch(file, '*.cs')
+                ):
+                    other_files.append(file)
+    return other_files
+print( get_mods_dirs() )
+print( get_mods_files() )
+input()
+
+
+
+
+'''
+Ejecutar juego
+'''
+def execute_game():
+    if os.path.isfile(exe_gta_sa):
+        subprocess.Popen(exe_gta_sa)
 
 
 
@@ -138,10 +191,10 @@ while loop:
         #    option_continue = False
         if option_continue == True:
             set_profile( profile=dict_profiles[option], text_ini=text_ini )
-            subprocess.Popen(exe_gta_sa)
+            execute_game()
             loop = False
         else:
             pass
     else:
-        subprocess.Popen(exe_gta_sa)
+        execute_game()
         loop = False
