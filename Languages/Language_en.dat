@@ -131,5 +131,17 @@ shelf=Shelf
 shelf_square=Square shelf
 rectangular_wall=Rectangular wall
 
-# Random
+# Launcher gta sa
+exit_and_exec_game=Exit and execute the game
+current_profile=Current profile
 enter_to_start=Press enter to start
+set_profile=Set profile
+config_profile=Configure Profile
+config_bools=Configure Booleans
+
+IgnoreFiles=Ignored files
+IgnoreMods=Ignored mods
+IncludeMods=Mods included
+ExclusiveMods=Exclusive mods
+
+back=Back

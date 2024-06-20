@@ -128,5 +128,17 @@ shelf=Repisa
 shelf_square=Repisa cuadrada
 rectangular_wall=Pared rectangular
 
-# No se
+# Launcer Gta sa
+exit_and_exec_game=Salir y ejecutar el juego
+current_profile=Perfil actual
 enter_to_start=Preciona enter para iniciar
+set_profile=Seleccionar perfil
+config_profile=Configurar perfil
+config_bools=Configurar Booleanos
+
+IgnoreFiles=Archivos ignorados
+IgnoreMods=Mods Ignorados
+IncludeMods=Mods incluidos
+ExclusiveMods=Mods exclusivos
+
+back=Atras

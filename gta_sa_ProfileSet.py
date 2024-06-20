@@ -1,162 +1,145 @@
 from Modulos.Modulo_System import *
 from Modulos.Modulo_Files import *
 from Modulos.Modulo_Language import *
-from Modulos.Modulo_System import *
 from Modulos.Modulo_ShowPrint import *
 from Modulos.Modulo_Text import *
 from pathlib import Path as pathlib
 import os, subprocess
 
-
-dir_main = pathlib().absolute()
-
-exe_gta_sa = os.path.join(dir_main, 'gta_sa.exe')
-
-dir_modloader = os.path.join( dir_main, 'modloader' )
-modloader_file = os.path.join( dir_modloader, 'modloader.ini' )
+from Modulos.gta_modloader_function import *
 
 
-if os.path.isfile( modloader_file ):
-    #print('Existe el archivo')
 
-    text_ini = Text_Read(
-        file_and_path=modloader_file,
-        option='ModeText',
-        encoding="utf-8"
-    )
-    #with open( modloader_file, 'r', encoding='utf-8') as text:
-    #    pass#text_ini = text.read()
-    #text_ini = Ignore_Comment(text=text_ini, comment=';')
-else:
-    #print( 'No existe el archivo' )
-    text_ini = None
+option_text_input = f'{ get_text("option") }: '
+
+
+'''
+Menu seleccionar perfil
+'''
+def menu_set_profile():
+    menu_title = Title(f'Modloader {get_text("set_profile")}',print_mode=False)
+    menu_profiles = ''
+    dict_profiles = {}
+    number = 1
+    for profile in get_profiles():
+        menu_profiles += f'{number}. {profile}\n'
+        dict_profiles.update( {number:profile} )
+        number += 1
+
+    loop = True
+    while loop:
+        # Mostrar Opciones y establecer opcion
+        CleanScreen()
+        try:
+            option = int(input(
+                menu_title +
+                get_current_profile(more_text=True) +
+                menu_profiles +
+                option_text_input
+            ))
+        except:
+            option = -1
+
+
+        # Verificar que la opcion sea correcta.
+        go = False
+        for profile in dict_profiles.keys():
+            if option == profile:
+                go = True
+
+
+        # Establecer perfil o no
+        if go == True:
+            option_continue = Continue()
+            if option_continue == True:
+                loop = False
+                return dict_profiles[option]
+            else:
+                pass
+        else:
+            loop = False
+            CleanScreen()
+            Continue(
+                text=f'{get_text("option")}: {option}',
+                message_error=True
+            )
+            #input(
+            #    'ERROR\n'+
+            #    f"{get_text('continue_enter')}..."
+            #)
+            return None
 
 
 
 
 '''
-Obtener perfiles
-Devuelve en una lista los perfiles
+Manu Configurar perfil
 '''
-def get_profiles():
-    if not text_ini == None:
-        profiles = []
-        for line in text_ini.split('\n'):
-            if line.startswith('[Profiles.'):
-                line_text = Ignore_Comment(line, ';').replace(' ', '').replace('[', '').replace(']','')
-                profile = line_text.split('.')
-                if profile[2] == 'Config':
-                    profiles.append(profile[1])
-        return profiles
-#print( get_profiles() )
+def menu_config_profile():
+    profile = menu_set_profile()
+    if not profile == None:
+        menu_title = Title(f"Modloader {get_text('config_profile')}", print_mode=False)
+        dict_options = {
+            1: 'config_bools',
+            2: 'IgnoreFiles',
+            3: 'IgnoreMods',
+            4: 'IncludeMods',
+            5: 'ExclusiveMods',
+            0: 'back'
+        }
+        menu_options = ''
+        for option in dict_options.keys():
+            menu_options += f"{option}. { get_text(dict_options[option]) }\n"
+        loop = True
+        while loop:
+            # Mostrar Opciones
+            CleanScreen()
+            try:
+                option = int(input(
+                    menu_title +
+                    menu_options +
+                    option_text_input
+                ))
+            except:
+                option = -1
 
+            # Verificar que la Opcion este correta
+            go = False
+            for key in dict_options.keys():
+                if option == key:
+                    go = True
 
-
-'''
-Cambiar perfil
-Establece en el archivo "modloader.ini", el perfil "Profile=El_asignado"
-'''
-def set_profile(profile=None, text_ini=None):
-    good_change = False
-    if not text_ini == None:
-        text_ready = ''
-        for line in text_ini.split('\n'):
-            if (
-                line.startswith('Profile') and
-                (not profile == None)
-            ):
-                line_text = Ignore_Comment(line, ';').replace(' ','')
-                line_profile = line_text.split('=')
-                #for text in line_profile:
-                    #print( text )
-                if line_profile[1] == profile:
-                    pass
+            # Accionar opcion
+            if go == True:
+                option = dict_options[option]
+                if not option == 'back':
+                    if option == 'config_bools':
+                        input( get_profile_parameter_Config(profile=profile) )
+                    else:
+                        if (
+                            option == 'IgnoreFiles'
+                        ):
+                            print( get_mods_files() )
+                        else:
+                            print( get_mods_dirs() )
+                        input( get_profile_parameter_listMods(profile=profile, parameter=option) )
                 else:
-                    line = f'{line_profile[0]}={profile}'
-                    good_change = True
-                #print(line)
-            text_ready += f'{line}\n'
-        text_ready = text_ready[:-1]
-
-    if good_change == True:
-        with open(modloader_file, 'w') as text:
-            text.write(text_ready)
-
-        return text_ready
-    else:
-        return None
-
-
-
-'''
-Obtener los mods del juego
-'''
-def get_mods_dirs(path=False):
-    # Devuelve en una lista las carpetas "main" en modloader
-    all_files = Files_List( files='*', path=dir_modloader, remove_path=False)
-    dirs = []
-    for file in all_files:
-        if os.path.isdir(file):
-            file_ready = file.replace(dir_modloader, '')
-            if get_system() == 'win':
-                file_ready = file_ready.replace( '\\', '')
-            else:
-                file_ready = file_ready.replace( '/', '')
-
-            if not file_ready.startswith('.'):
-                add = True
-            else:
-                add = False
-
-            if path == True:
-                file_ready = file
-
-
-            if add == True:
-                dirs.append( file_ready )
-    return dirs
-
-def get_mods_files():
-    import fnmatch
-    # Devuelve en una lista "archivos.asi" y "archivos.cs"
-    all_files_mods = get_mods_dirs(path=True)
-    other_files = []
-    for file_mod in all_files_mods:
-        for name_dir, dirs, files in os.walk(file_mod):
-            for file in files:
-                if (
-                    fnmatch.fnmatch(file, '*.asi') or
-                    fnmatch.fnmatch(file, '*.cs')
-                ):
-                    other_files.append(file)
-    return other_files
-print( get_mods_dirs() )
-print( get_mods_files() )
-input()
-
-
-
-
-'''
-Ejecutar juego
-'''
-def execute_game():
-    if os.path.isfile(exe_gta_sa):
-        subprocess.Popen(exe_gta_sa)
+                    loop = False
 
 
 
 
 # Menu Loop
-menu_title = Title('Modloader Set Profile',print_mode=False)
+menu_title = Title(f'GTA Profile Set',print_mode=False)
+dict_options = {
+    1 : 'set_profile',
+    2 : 'config_profile',
+    0 : 'exit'
+}
 menu_options = ''
-dict_profiles = {}
-number = 1
-for profile in get_profiles():
-    menu_options += f'{number}. {profile}\n'
-    dict_profiles.update( {number:profile} )
-    number += 1
-menu_options += f'X. {get_text("enter_to_start")}\n\n'
+for option in dict_options.keys():
+    menu_options += f'{option}. {get_text( dict_options[option] )}\n'
+
 
 loop = True
 while loop:
@@ -165,36 +148,40 @@ while loop:
     try:
         option = int(input(
             menu_title +
+            get_current_profile(more_text=True) +
             menu_options +
-            f'{ get_text("option") }: '
+            option_text_input
         ))
     except:
         option = -1
 
 
 
-    # Verificar que la opcion sea correcta.
+    # Establecer opcion.
     go = False
-    for profile in dict_profiles.keys():
-        if option == profile:
+    for dict_option in dict_options.keys():
+        if option == dict_option:
             go = True
 
-
-
-
-    # Establecer perfil o no
     if go == True:
-        option_continue = Continue()
-        #if option_continue == YesNo('yes'):
-        #    option_continue = True
-        #elif option_continue == YesNo('no'):
-        #    option_continue = False
-        if option_continue == True:
-            set_profile( profile=dict_profiles[option], text_ini=text_ini )
-            execute_game()
+        option = dict_options[option]
+        if option == 'set_profile':
+            profile = menu_set_profile()
+            if not set_profile == None:
+                set_profile( profile=profile, text_ini=get_text_modloader() )
+                exec_and_exit = Continue(
+                    get_current_profile(more_text=True) +
+                    f'{get_text("exit_and_exec_game")}?'
+                )
+                if exec_and_exit == True:
+                    loop = False
+                    execute_game()
+                else:
+                    pass
+        elif option == 'config_profile':
+            menu_config_profile()
+        elif option == 'exit':
             loop = False
-        else:
-            pass
     else:
-        execute_game()
-        loop = False
+        pass
+
