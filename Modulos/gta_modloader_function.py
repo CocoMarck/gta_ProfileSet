@@ -12,6 +12,18 @@ exe_gta_sa = os.path.join(dir_main, 'gta_sa.exe')
 
 dir_modloader = os.path.join( dir_main, 'modloader' )
 modloader_file = os.path.join( dir_modloader, 'modloader.ini' )
+encoding = 'utf-8'
+
+
+
+
+def execute_game():
+    '''
+    Ejecutar juego
+    '''
+    if os.path.isfile(exe_gta_sa):
+        subprocess.Popen(exe_gta_sa)
+
 
 
 
@@ -22,7 +34,7 @@ def get_text_modloader(mode_list=False):
         text_ini = Text_Read(
             file_and_path=modloader_file,
             option='ModeText',
-            encoding="utf-8"
+            encoding=encoding
         )
         #with open( modloader_file, 'r', encoding='utf-8') as text:
         #    pass#text_ini = text.read()
@@ -108,7 +120,7 @@ def set_profile(profile=None, text_ini=None):
         text_ready = text_ready[:-1]
 
     if good_change == True:
-        with open(modloader_file, 'w') as text:
+        with open(modloader_file, 'w', encoding=encoding) as text:
             text.write(text_ready)
 
         return text_ready
@@ -144,6 +156,9 @@ def get_mods_dirs(path=False):
             if add == True:
                 dirs.append( file_ready )
     return dirs
+
+
+
 
 def get_mods_files():
     import fnmatch
@@ -222,7 +237,10 @@ def get_profile_parameter_Config(profile=None):
         'ExcludeAllMods':None
     }
     text_ini_list = get_text_modloader(mode_list=True)
-    if profile_line > 0:
+    if (
+        profile_line > 0 and
+        profile_line < ( len(text_ini_list) -1 )
+    ):
         number = 0
         loop = True
         while loop:
@@ -254,16 +272,22 @@ def get_profile_parameter_Config(profile=None):
 
 
 def get_profile_parameter_listMods(profile=None, parameter='IgnoreFiles'):
+    '''
+    Listar los mods que contenga algun parametro del perfil
+    '''
     profile_line = get_profile_parameters_line( profile=profile, parameter=parameter )
 
     list_IgnoreFiles = []
     text_ini_list = get_text_modloader(mode_list=True)
-    if profile_line > 0:
+    if (
+        profile_line > 0 and
+        profile_line < len(text_ini_list)
+    ):
         number = 0
         loop = True
         while loop:
             number += 1
-            line_text = Ignore_Comment( text_ini_list[profile_line+number], ';' ).replace(' ', '')
+            line_text = Ignore_Comment( text_ini_list[profile_line+number], ';' )#.replace(' ', '')
             if line_text.startswith('[Profiles.'):
                 loop = False
             elif line_text == '':
@@ -281,9 +305,70 @@ def get_profile_parameter_listMods(profile=None, parameter='IgnoreFiles'):
 
 
 
-'''
-Ejecutar juego
-'''
-def execute_game():
-    if os.path.isfile(exe_gta_sa):
-        subprocess.Popen(exe_gta_sa)
+# Establecer Mods
+def set_profile_parameter_mod(profile=None, parameter=None, mod_file=None):
+    '''
+    Establecer Mod en algun parametro de un perfil
+    '''
+    # Listar mods, agregar todos los mods, incluyendo el nuevo mod
+    list_mods = []
+
+    add_mod = True
+    for mod in get_profile_parameter_listMods(profile=profile, parameter=parameter):
+        list_mods.append(mod)
+        if mod == mod_file:
+            add_mod = False
+
+    if add_mod == True:
+        list_mods.append(mod_file)
+
+    # Modloader | Detectar Lineas a ignorar
+    number_parameter_start = get_profile_parameters_line(profile=profile, parameter=parameter)+1
+    number = 0
+    count_parameter_fin = True
+    number_parameter_fin = 0
+    modloader_ini = get_text_modloader(mode_list=True)
+    for line in modloader_ini:
+        if number > number_parameter_start:
+            line = Ignore_Comment( line, ';' )
+            if count_parameter_fin == True:
+                if not line.startswith('[Profiles.'):
+                    number_parameter_fin += 1
+                else:
+                    count_parameter_fin = False
+
+        number += 1
+    number_parameter_fin += number_parameter_start
+
+    # Modloader | Agregar mod al IgnoreMods
+    text_ready = ''
+    number = 0
+    for line in modloader_ini:
+        # En la linea de inicio se agergaran los mods
+        if number == number_parameter_start:
+            add_line = False
+            for mod in list_mods:
+                text_ready += f'{mod}\n'
+            text_ready += '\n\n'
+        elif number > number_parameter_start:
+            if number > number_parameter_fin:
+                add_line = True
+            else:
+                add_line = False
+        else:
+            add_line = True
+
+        if add_line == True:
+            text_ready += f'{line}\n'
+        number += 1
+
+    text_ready = text_ready[:-1]
+    with open(modloader_file, 'w', encoding=encoding) as text:
+        text.write(text_ready)
+    return text_ready
+
+#print(
+#    set_profile_parameter_mod(profile='Default', parameter='IgnoreFiles', mod_file='imfx.asi'),
+#    set_profile_parameter_mod(profile='Default', parameter='ExclusiveMods', mod_file='imfx.asi'),
+#)
+#input()
