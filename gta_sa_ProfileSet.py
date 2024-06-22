@@ -313,14 +313,16 @@ def menu_config_profile():
                         # Menu elegir si agregar o remover mod
                         add_or_remove = menu_add_or_remove_mod(profile=profile, parameter=option)
                         mods = None
-                        if (
-                            option == 'IgnoreFiles'
-                        ):
-                            # Agregar mods archivos
-                            mods = menu_add_mods('files')
-                        else:
-                            # Agregar mods tipo carpeta
-                            mods = menu_add_mods('dirs')
+
+                        if not add_or_remove == None:
+                            if (
+                                option == 'IgnoreFiles'
+                            ):
+                                # Agregar mods archivos
+                                mods = menu_add_mods('files')
+                            else:
+                                # Agregar mods tipo carpeta
+                                mods = menu_add_mods('dirs')
 
                         # Agergar o remover mods
                         if add_or_remove == 'add':
@@ -381,7 +383,8 @@ while loop:
         option = dict_options[option]
         if option == 'set_profile':
             profile = menu_set_profile()
-            if not set_profile( profile=profile, text_ini=get_text_modloader() ) == None:
+            if not profile == None:
+                set_profile( profile=profile, text_ini=get_text_modloader() )
                 exec_and_exit = Continue(
                     get_current_profile(more_text=True) +
                     f'{get_text("exit_and_exec_game")}?'
