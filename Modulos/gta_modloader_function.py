@@ -237,33 +237,33 @@ def get_profile_parameter_Config(profile=None):
         'ExcludeAllMods':None
     }
     text_ini_list = get_text_modloader(mode_list=True)
-    if (
-        profile_line > 0 and
-        profile_line < ( len(text_ini_list) -1 )
-    ):
+    if profile_line > 0:
         number = 0
         loop = True
         while loop:
             number += 1
-            line_text = Ignore_Comment( text_ini_list[profile_line+number], ';' )
-            if line_text.startswith('IgnoreAllMods'):
-                true_or_false = line_text.replace(' ', '').split('=')[1].lower()
-                if true_or_false == 'true':
-                    dict_parameters['IgnoreAllMods'] = True
-                else:
-                    dict_parameters['IgnoreAllMods'] = False
+            if profile_line+number < len(text_ini_list):
+                line_text = Ignore_Comment( text_ini_list[profile_line+number], ';' )
+                if line_text.startswith('IgnoreAllMods'):
+                    true_or_false = line_text.replace(' ', '').split('=')[1].lower()
+                    if true_or_false == 'true':
+                        dict_parameters['IgnoreAllMods'] = True
+                    else:
+                        dict_parameters['IgnoreAllMods'] = False
 
-            elif line_text.startswith('ExcludeAllMods'):
-                true_or_false = line_text.replace(' ', '').split('=')[1].lower()
-                if true_or_false == 'true':
-                    dict_parameters['ExcludeAllMods'] = True
-                else:
-                    dict_parameters['ExcludeAllMods'] = False
+                elif line_text.startswith('ExcludeAllMods'):
+                    true_or_false = line_text.replace(' ', '').split('=')[1].lower()
+                    if true_or_false == 'true':
+                        dict_parameters['ExcludeAllMods'] = True
+                    else:
+                        dict_parameters['ExcludeAllMods'] = False
 
-            if (
-                (not dict_parameters['IgnoreAllMods'] == None) and
-                (not dict_parameters['ExcludeAllMods'] == None)
-            ):
+                if (
+                    (not dict_parameters['IgnoreAllMods'] == None) and
+                    (not dict_parameters['ExcludeAllMods'] == None)
+                ):
+                    loop = False
+            else:
                 loop = False
 
     return dict_parameters
@@ -279,21 +279,21 @@ def get_profile_parameter_listMods(profile=None, parameter='IgnoreFiles'):
 
     list_IgnoreFiles = []
     text_ini_list = get_text_modloader(mode_list=True)
-    if (
-        profile_line > 0 and
-        profile_line < len(text_ini_list)
-    ):
+    if profile_line > 0:
         number = 0
         loop = True
         while loop:
             number += 1
-            line_text = Ignore_Comment( text_ini_list[profile_line+number], ';' )#.replace(' ', '')
-            if line_text.startswith('[Profiles.'):
-                loop = False
-            elif line_text == '':
-                pass
+            if (profile_line+number) < len(text_ini_list):
+                line_text = Ignore_Comment( text_ini_list[profile_line+number], ';' )#.replace(' ', '')
+                if line_text.startswith('[Profiles.'):
+                    loop = False
+                elif line_text == '':
+                    pass
+                else:
+                    list_IgnoreFiles.append(line_text)
             else:
-                list_IgnoreFiles.append(line_text)
+                loop = False
     return list_IgnoreFiles
 #print( get_profile_parameters_line(profile='Default') )
 #print( get_profile_parameter_Config(profile='Default') )
@@ -305,10 +305,10 @@ def get_profile_parameter_listMods(profile=None, parameter='IgnoreFiles'):
 
 
 
-# Establecer Mods
-def set_profile_parameter_mod(profile=None, parameter=None, mod_file=None):
+# Agregar Mods al parametro
+def add_profile_parameter_mod(profile=None, parameter=None, mod_file=None):
     '''
-    Establecer Mod en algun parametro de un perfil
+    Agregar Mod en algun parametro de un perfil
     '''
     # Listar mods, agregar todos los mods, incluyendo el nuevo mod
     list_mods = []
@@ -316,7 +316,7 @@ def set_profile_parameter_mod(profile=None, parameter=None, mod_file=None):
     add_mod = True
     for mod in get_profile_parameter_listMods(profile=profile, parameter=parameter):
         list_mods.append(mod)
-        if mod == mod_file:
+        if mod.startswith(mod_file):
             add_mod = False
 
     if add_mod == True:
@@ -367,8 +367,17 @@ def set_profile_parameter_mod(profile=None, parameter=None, mod_file=None):
         text.write(text_ready)
     return text_ready
 
+
+
+
+def remove_profile_parameter_mod(profile=None, parameter=None, mod=None):
+    '''
+    Remover mod de algun parametro de un perfil
+    '''
+    pass
+
 #print(
-#    set_profile_parameter_mod(profile='Default', parameter='IgnoreFiles', mod_file='imfx.asi'),
-#    set_profile_parameter_mod(profile='Default', parameter='ExclusiveMods', mod_file='imfx.asi'),
+#    add_profile_parameter_mod(profile='Default', parameter='IgnoreFiles', mod_file='imfx.asi'),
+#    add_profile_parameter_mod(profile='Default', parameter='ExclusiveMods', mod_file='imfx.asi'),
 #)
 #input()

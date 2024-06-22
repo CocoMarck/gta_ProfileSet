@@ -145,3 +145,8 @@ IncludeMods=Mods included
 ExclusiveMods=Exclusive mods
 
 back=Back
+add=Add
+remove=Remove
+
+mods_files=Mod files
+mods_dirs=Mod directories

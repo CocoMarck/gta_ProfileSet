@@ -142,3 +142,8 @@ IncludeMods=Mods incluidos
 ExclusiveMods=Mods exclusivos
 
 back=Atras
+add=Agergar
+remove=Remover
+
+mods_files=Archivos de mods
+mods_dirs=Directorios de mods
