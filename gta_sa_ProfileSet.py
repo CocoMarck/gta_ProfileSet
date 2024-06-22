@@ -350,8 +350,10 @@ def menu_config_profile():
 # Menu Loop
 menu_title = Title(f'GTA Profile Set',print_mode=False)
 dict_options = {
-    1 : 'set_profile',
-    2 : 'config_profile',
+    1 : 'start',
+    2 : 'set_profile',
+    3 : 'config_profile',
+    4 : 'add_or_remove_profile',
     0 : 'exit'
 }
 menu_options = ''
@@ -383,7 +385,16 @@ while loop:
 
     if go == True:
         option = dict_options[option]
-        if option == 'set_profile':
+        if option == 'start':
+            CleanScreen()
+            exec_and_exit = Continue(
+                get_current_profile(more_text=True) +
+                f'{get_text("exit_and_exec_game")}?'
+            )
+            if exec_and_exit == True:
+                loop = False
+            execute_game()
+        elif option == 'set_profile':
             profile = menu_set_profile()
             if not profile == None:
                 set_profile( profile=profile, text_ini=get_text_modloader() )
@@ -402,4 +413,3 @@ while loop:
             loop = False
     else:
         pass
-

@@ -135,6 +135,7 @@ enter_to_start=Preciona enter para iniciar
 set_profile=Seleccionar perfil
 config_profile=Configurar perfil
 config_bools=Configurar Booleanos
+add_or_remove_profile=Agregar o borrar perfil
 
 IgnoreFiles=Archivos ignorados
 IgnoreMods=Mods Ignorados

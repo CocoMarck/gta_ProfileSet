@@ -138,6 +138,7 @@ enter_to_start=Press enter to start
 set_profile=Set profile
 config_profile=Configure Profile
 config_bools=Configure Booleans
+add_or_remove_profile=Add or remove profile
 
 IgnoreFiles=Ignored files
 IgnoreMods=Ignored mods

@@ -1,0 +1,6 @@
+# Cliente para consola
+pyinstaller --onefile --console --uac-admin .\gta_sa_ProfileSet.py
+
+
+# Cliente para interfaz
+pyinstaller --windowed --uac-admin .\gta_sa_ProfileSet.py

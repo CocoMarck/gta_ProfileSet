@@ -380,3 +380,106 @@ def add_or_remove_mod(profile=None, parameter=None, mod_file=None, option='add')
 #    add_or_remove_mod(profile='Default', parameter='ExclusiveMods', mod_file='imfx.asi'),
 #)
 #input()
+
+
+
+
+
+def add_profile(profile=None):
+    '''
+    Agregar perfil, solo si no existe
+    No incluir espacions
+    No incluir caracteres especiales como ". ' @ : ;"
+    '''
+    if profile == '':
+        profile == None
+    else:
+        profile = profile.replace(' ', '')
+    list_profiles = get_profiles()
+    modloader_ini = get_text_modloader()
+    if not profile == None:
+        go = True
+        for a_profile in list_profiles:
+            if a_profile == profile:
+                go = False
+
+        if go == True:
+            text_ready = (
+                modloader_ini +
+                (
+                '\n'
+                f'[Profiles.{profile}.Config]\n'
+                '\n'
+                f'[Profiles.{profile}.Priority]\n'
+                '\n'
+                f'[Profiles.{profile}.IgnoreFiles]\n'
+                '\n'
+                f'[Profiles.{profile}.IgnoreMods]\n'
+                '\n'
+                f'[Profiles.{profile}.IncludeMods]\n'
+                '\n'
+                f'[Profiles.{profile}.ExclusiveMods]\n'
+                )
+            )
+            with open(modloader_file, 'w', encoding=encoding) as text:
+                text.write(text_ready)
+            return True
+#print( add_profile('Cacas') )
+#print( add_profile('Default') )
+#print( add_profile('Test') )
+#input()
+
+
+
+
+def remove_profile(profile=None):
+    '''
+    Borrar un perfil
+    Solo se borra si el perfil existe y si no es "Default"
+    '''
+    list_profiles = get_profiles()
+
+    if (
+        (not profile == 'Default') and
+        ( type(profile) == str )
+    ):
+        go = False
+        for a_profile in list_profiles:
+            if a_profile == profile:
+                go = True
+
+        if go == True:
+            # Texto modloader
+            modloader_ini = get_text_modloader(mode_list=True)
+
+            # Inicio de linea del parametro y fin de lina del parametro
+            list_number = [
+                get_profile_parameters_line(profile=profile, parameter='Config'),
+                get_profile_parameters_line(profile=profile, parameter='Priority'),
+                get_profile_parameters_line(profile=profile, parameter='IgnoreFiles'),
+                get_profile_parameters_line(profile=profile, parameter='IgnoreMods'),
+                get_profile_parameters_line(profile=profile, parameter='IncludeMods'),
+                get_profile_parameters_line(profile=profile, parameter='ExclusiveMods'),
+            ]
+            start_number = min(list_number)
+            limit_number = max(list_number)
+
+            # Agregar solo el texto, pero excluir el del parametro removido
+            text_ready = ''
+            number = 0
+            for line in modloader_ini:
+                if number >= start_number:
+                    if not number <= limit_number:
+                        text_ready += f'{line}\n'
+                else:
+                    text_ready += f'{line}\n'
+                number += 1
+            text_ready = text_ready[:-1]
+
+            with open(modloader_file, 'w', encoding=encoding) as text:
+                text.write(text_ready)
+
+            return True
+#print( get_profile_parameter_listMods(profile='Default', parameter='Priority') )
+#print( remove_profile('Cacas') )
+#input()
