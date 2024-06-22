@@ -325,19 +325,21 @@ def menu_config_profile():
                                 mods = menu_add_mods('dirs')
 
                         # Agergar o remover mods
-                        if add_or_remove == 'add':
+                        if (
+                            add_or_remove == 'add' or add_or_remove == 'remove'
+                        ):
                             if not mods == None:
                                 if type(mods) == list:
                                     for mod in mods:
-                                        add_profile_parameter_mod(
-                                            profile=profile, parameter=option, mod_file=mod
+                                        add_or_remove_mod(
+                                            profile=profile, parameter=option, mod_file=mod,
+                                            option=add_or_remove
                                         )
                                 else:
-                                    add_profile_parameter_mod(
-                                        profile=profile, parameter=option, mod_file=mods
+                                    add_or_remove_mod(
+                                        profile=profile, parameter=option, mod_file=mods,
+                                        option=add_or_remove
                                     )
-                        elif add_or_remove == 'remove':
-                            pass
                         input( get_profile_parameter_listMods(profile=profile, parameter=option) )
                 else:
                     loop = False

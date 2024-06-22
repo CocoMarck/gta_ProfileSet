@@ -305,22 +305,30 @@ def get_profile_parameter_listMods(profile=None, parameter='IgnoreFiles'):
 
 
 
-# Agregar Mods al parametro
-def add_profile_parameter_mod(profile=None, parameter=None, mod_file=None):
+# Agregar O remover Mods al parametro de im perfil
+def add_or_remove_mod(profile=None, parameter=None, mod_file=None, option='add'):
     '''
     Agregar Mod en algun parametro de un perfil
     '''
-    # Listar mods, agregar todos los mods, incluyendo el nuevo mod
+    # Listar mods
+    # add: agregar todos los mods, agregando "mod_file".
+    # remove: agergar todos los mods anteriores, pero remover el "mod_file"
     list_mods = []
 
     add_mod = True
     for mod in get_profile_parameter_listMods(profile=profile, parameter=parameter):
-        list_mods.append(mod)
         if mod.startswith(mod_file):
             add_mod = False
+            if option == 'add':
+                list_mods.append(mod)
+            elif option == 'remove':
+                pass
+        else:
+            list_mods.append(mod)
 
-    if add_mod == True:
-        list_mods.append(mod_file)
+    if option == 'add':
+        if add_mod == True:
+            list_mods.append(mod_file)
 
     # Modloader | Detectar Lineas a ignorar
     number_parameter_start = get_profile_parameters_line(profile=profile, parameter=parameter)+1
@@ -367,17 +375,8 @@ def add_profile_parameter_mod(profile=None, parameter=None, mod_file=None):
         text.write(text_ready)
     return text_ready
 
-
-
-
-def remove_profile_parameter_mod(profile=None, parameter=None, mod=None):
-    '''
-    Remover mod de algun parametro de un perfil
-    '''
-    pass
-
 #print(
-#    add_profile_parameter_mod(profile='Default', parameter='IgnoreFiles', mod_file='imfx.asi'),
-#    add_profile_parameter_mod(profile='Default', parameter='ExclusiveMods', mod_file='imfx.asi'),
+#    add_or_remove_mod(profile='Default', parameter='IgnoreFiles', mod_file='imfx.asi'),
+#    add_or_remove_mod(profile='Default', parameter='ExclusiveMods', mod_file='imfx.asi'),
 #)
 #input()
