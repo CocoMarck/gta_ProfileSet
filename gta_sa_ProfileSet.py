@@ -148,15 +148,24 @@ def menu_set_bool():
     pass
 
 
-def menu_set_mods_files(profile=None, parameter=None):
-    menu_title = Title( f"{get_text('select')}: {get_text('mods_files')}", print_mode=False)
+def menu_add_mods(option='files'):
+    menu_title = Title(
+        f"{get_text('select')}: {get_text(f'mods_{option}')}",
+        print_mode=False
+    )
     menu_options = ''
     dict_mods_files = {}
     number = 1
-    for mod in get_mods_files():
-        dict_mods_files.update( { number: mod } )
-        menu_options += f'{number}. {mod}\n'
-        number += 1
+    if option == 'files':
+        for mod in get_mods_files():
+            dict_mods_files.update( { number: mod } )
+            menu_options += f'{number}. {mod}\n'
+            number += 1
+    elif option == 'dirs':
+        for mod in get_mods_dirs():
+            dict_mods_files.update( { number: mod } )
+            menu_options += f'{number}. {mod}\n'
+            number += 1
 
     # Loop
     loop = True
@@ -185,29 +194,74 @@ def menu_set_mods_files(profile=None, parameter=None):
                         selected_option = dict_mods_files[option]
 
 
-        # Establecer Archivos de Mods
-        if mode_list == True:
-            if not selected_option == []:
-                for mod in selected_option:
-                    set_profile_parameter_mod(
-                        profile=profile, parameter=parameter, mod_file=mod
-                    )
-        else:
-            if not selected_option == None:
-                set_profile_parameter_mod(
-                    profile=profile, parameter=parameter, mod_file=selected_option
-                )
-        print(
-            selected_option, '\n',
-            option
-        )
+        # Devolver Archivos de Mods
         loop = False
+        if mode_list == True:
+            if selected_option == []:
+                return None
+            else:
+                return selected_option
+        else:
+            return selected_option
 
 
 
 
-def menu_set_mods_dirs(profile=None):
-    pass
+def menu_add_or_remove_mod(profile=None, parameter=None):
+    '''
+    Menu para selecionar si agregar o remover mod
+    '''
+    # Texto para menu
+    menu_title = Title(f"{get_text('add')} | {get_text('remove')}" ,print_mode=False)
+    dict_options = {
+        1:get_text('add'),
+        2:get_text('remove'),
+        0:get_text('back')
+    }
+    menu_options = ''
+    for key in dict_options.keys():
+        menu_options += f"{key}. {dict_options[key]}\n"
+
+    menu_mods = ''
+    if (
+        (not parameter == None)and
+        (not profile == None)
+    ):
+        menu_mods += 'Mods:\n'
+        for mod in get_profile_parameter_listMods(profile=profile, parameter=parameter):
+            menu_mods += f'{mod}\n'
+        menu_mods += '\n'
+
+    # Loop
+    loop = True
+    while loop:
+        # Mostrar opciones
+        CleanScreen()
+        try:
+            option = int(input(
+                menu_title +
+                menu_mods +
+                menu_options +
+                option_text_input
+            ))
+        except:
+            option = -1
+
+        # Verificar que la opcion seleccionada exista
+        go = False
+        for key in dict_options.keys():
+            if key == option:
+                go = True
+
+        # Parar loop y Devolver agregar o remover.
+        if go == True:
+            loop = False
+            if option == 1:
+                return 'add'
+            elif option == 2:
+                return 'remove'
+            elif option == 0:
+                return None
 
 
 
@@ -218,7 +272,7 @@ Manu Configurar perfil
 def menu_config_profile():
     profile = menu_set_profile()
     if not profile == None:
-        menu_title = Title(f"Modloader {get_text('config_profile')}", print_mode=False)
+        menu_title = Title(f"{get_text('config_profile')} | {profile}", print_mode=False)
         dict_options = {
             1: 'config_bools',
             2: 'IgnoreFiles',
@@ -256,13 +310,32 @@ def menu_config_profile():
                     if option == 'config_bools':
                         input( get_profile_parameter_Config(profile=profile) )
                     else:
+                        # Menu elegir si agregar o remover mod
+                        add_or_remove = menu_add_or_remove_mod(profile=profile, parameter=option)
+                        mods = None
                         if (
                             option == 'IgnoreFiles'
                         ):
-                            menu_set_mods_files(profile=profile, parameter=option)
+                            # Agregar mods archivos
+                            mods = menu_add_mods('files')
                         else:
-                            for x in get_mods_dirs():
-                                print( x )
+                            # Agregar mods tipo carpeta
+                            mods = menu_add_mods('dirs')
+
+                        # Agergar o remover mods
+                        if add_or_remove == 'add':
+                            if not mods == None:
+                                if type(mods) == list:
+                                    for mod in mods:
+                                        add_profile_parameter_mod(
+                                            profile=profile, parameter=option, mod_file=mod
+                                        )
+                                else:
+                                    add_profile_parameter_mod(
+                                        profile=profile, parameter=option, mod_file=mods
+                                    )
+                        elif add_or_remove == 'remove':
+                            pass
                         input( get_profile_parameter_listMods(profile=profile, parameter=option) )
                 else:
                     loop = False
