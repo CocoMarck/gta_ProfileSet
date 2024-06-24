@@ -1,4 +1,4 @@
-set_lang=
+set_lang=Spanish
 
 
 # Language English
@@ -139,7 +139,9 @@ set_profile=Set profile
 config_profile=Configure Profile
 config_bools=Configure Booleans
 add_or_remove_profile=Add or remove profile
+profile=Profile
 
+Priority=Mod priority
 IgnoreFiles=Ignored files
 IgnoreMods=Ignored mods
 IncludeMods=Mods included

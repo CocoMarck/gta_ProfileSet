@@ -9,11 +9,11 @@ from Modulos.gta_modloader_function import *
 
 
 
-'''
-Funcion que convierte texto a numero, o a una lista de numeros.
-Solo si se escriben caracteres tipo numero, o el caracter "," o espacio " "
-'''
 def input_text_to_number(text='0', list_mode=True):
+    '''
+    Funcion que convierte texto a numero, o a una lista de numeros.
+    Solo si se escriben caracteres tipo numero, o el caracter "," o espacio " "
+    '''
     # Solo se dovolveran numeros, el texto solo incluye estos caracteres
     only_include = '0123456789'
     character_coma = ','
@@ -82,11 +82,13 @@ def input_text_to_number(text='0', list_mode=True):
 option_text_input = f'{ get_text("option") }: '
 
 
-'''
-Menu seleccionar perfil
-'''
+
+
 def menu_set_profile():
-    menu_title = Title(f'Modloader {get_text("set_profile")}',print_mode=False)
+    '''
+    Menu seleccionar perfil
+    '''
+    menu_title = Title( f'Modloader {get_text("set_profile")}', print_mode=False )
     menu_profiles = ''
     dict_profiles = {}
     number = 1
@@ -141,14 +143,17 @@ def menu_set_profile():
 
 
 
-'''
-Menu Seleccionar Capetas o archivos de Mods
-'''
 def menu_set_bool():
+    '''
+    Seleccionar el activar las opciones de excluir o ignorar todos los mods
+    '''
     pass
 
 
 def menu_add_mods(option='files'):
+    '''
+    Menu Seleccionar Capetas o archivos de Mods
+    '''
     menu_title = Title(
         f"{get_text('select')}: {get_text(f'mods_{option}')}",
         print_mode=False
@@ -266,19 +271,20 @@ def menu_add_or_remove_mod(profile=None, parameter=None):
 
 
 
-'''
-Manu Configurar perfil
-'''
 def menu_config_profile():
+    '''
+    Manu Configurar perfil
+    '''
     profile = menu_set_profile()
     if not profile == None:
         menu_title = Title(f"{get_text('config_profile')} | {profile}", print_mode=False)
         dict_options = {
             1: 'config_bools',
-            2: 'IgnoreFiles',
-            3: 'IgnoreMods',
-            4: 'IncludeMods',
-            5: 'ExclusiveMods',
+            2: 'Priority',
+            3: 'IgnoreFiles',
+            4: 'IgnoreMods',
+            5: 'IncludeMods',
+            6: 'ExclusiveMods',
             0: 'back'
         }
         menu_options = ''
@@ -347,69 +353,168 @@ def menu_config_profile():
 
 
 
-# Menu Loop
-menu_title = Title(f'GTA Profile Set',print_mode=False)
-dict_options = {
-    1 : 'start',
-    2 : 'set_profile',
-    3 : 'config_profile',
-    4 : 'add_or_remove_profile',
-    0 : 'exit'
-}
-menu_options = ''
-for option in dict_options.keys():
-    menu_options += f'{option}. {get_text( dict_options[option] )}\n'
+def menu_add_or_remove_profile():
+    '''
+    Menu agregar o remover perfil
+    '''
+    menu_title = Title( get_text('add_or_remove_profile'), print_mode=False )
+    dict_options = {
+        1:'add',
+        2:'remove',
+        0:'back'
+    }
+    menu_options = ''
+    for key in dict_options.keys():
+        menu_options += f"{key}. {get_text(dict_options[key])}\n"
+
+    # Loop
+    loop = True
+    while loop:
+        CleanScreen()
+        try:
+            option = int(input(
+                menu_title +
+                menu_options +
+                option_text_input
+            ))
+        except:
+            option = -1
+
+        # Verificar opcion correcta
+        go = False
+        for key in dict_options.keys():
+            if key == option:
+                go = True
 
 
-loop = True
-while loop:
-    # Mostrar Opciones y establecer opcion
+        # Establecer opcion
+        if go == True:
+            option = dict_options[option]
+            profile = None
+            if option == 'add':
+                CleanScreen()
+                profile = input(
+                    f"{get_text(option)}\n"
+                    f"{get_text('profile')}: "
+                )
+
+            elif option == 'remove':
+                profile = menu_set_profile()
+
+            elif option == 'back':
+                loop = False
+
+            if not profile == None:
+                if not profile == None:
+                    CleanScreen()
+                    if Continue(
+                        menu_title +
+                        f"{get_text(option)}?"
+                    ) == True:
+                        if option == 'add':
+                            add_profile(profile=profile)
+                        elif option == 'remove':
+                            remove_profile(profile=profile)
+            else:
+                loop = False
+
+
+
+
+def menu_execute_game(always_exec=True):
+    '''
+    Ejecutar juego
+    always_exec, establece si siempre ejcutar aunque elijas no en el input "salir y ejecutar"
+    '''
     CleanScreen()
-    try:
+    menu_title = Title( get_text('exec'), print_mode=False )
+    exec_and_exit = Continue(
+        menu_title +
+        get_current_profile(more_text=True) +
+        f'{get_text("exit_and_exec_game")}?'
+    )
+    if exec_and_exit == True:
+        execute_game()
+    else:
+        if always_exec == True:
+            execute_game()
+    return exec_and_exit
+
+
+
+
+
+# Menu Loop
+def menu_main():
+    '''
+    El menu Main
+    '''
+    menu_title = Title( text=f'GTA Profile Set', print_mode=False)
+    dict_options = {
+        1 : 'start',
+        2 : 'set_profile',
+        3 : 'config_profile',
+        4 : 'add_or_remove_profile',
+        0 : 'exit'
+    }
+    menu_options = ''
+    for option in dict_options.keys():
+        menu_options += f'{option}. {get_text( dict_options[option] )}\n'
+
+
+    loop = True
+    while loop:
+        # Mostrar Opciones y establecer opcion
+        CleanScreen()
         option = int(input(
             menu_title +
             get_current_profile(more_text=True) +
             menu_options +
             option_text_input
         ))
-    except:
-        option = -1
+        #try:
+        #    option = int(input(
+        #        menu_title +
+        #        get_current_profile(more_text=True) +
+        #        menu_options +
+        #        option_text_input
+        #    ))
+        #except:
+        #    option = -1
 
 
 
-    # Establecer opcion.
-    go = False
-    for dict_option in dict_options.keys():
-        if option == dict_option:
-            go = True
+        # Verificar opcion
+        go = False
+        for dict_option in dict_options.keys():
+            if option == dict_option:
+                go = True
 
-    if go == True:
-        option = dict_options[option]
-        if option == 'start':
-            CleanScreen()
-            exec_and_exit = Continue(
-                get_current_profile(more_text=True) +
-                f'{get_text("exit_and_exec_game")}?'
-            )
-            if exec_and_exit == True:
-                loop = False
-            execute_game()
-        elif option == 'set_profile':
-            profile = menu_set_profile()
-            if not profile == None:
-                set_profile( profile=profile, text_ini=get_text_modloader() )
-                exec_and_exit = Continue(
-                    get_current_profile(more_text=True) +
-                    f'{get_text("exit_and_exec_game")}?'
-                )
-                if exec_and_exit == True:
+        # Establecer ocion
+        if go == True:
+            option = dict_options[option]
+            if option == 'start':
+                if menu_execute_game(True) == True:
                     loop = False
-                    execute_game()
-                else:
-                    pass
-        elif option == 'config_profile':
-            menu_config_profile()
-        elif option == 'exit':
-            loop = False
-    else:
-        pass
+
+            elif option == 'set_profile':
+                profile = menu_set_profile()
+                if not profile == None:
+                    set_profile( profile=profile, text_ini=get_text_modloader() )
+                    if menu_execute_game(False) == True:
+                        loop = False
+
+            elif option == 'config_profile':
+                menu_config_profile()
+
+            elif option == 'add_or_remove_profile':
+                menu_add_or_remove_profile()
+
+            elif option == 'exit':
+                loop = False
+        else:
+            pass
+
+
+if __name__ == '__main__':
+    menu_main()

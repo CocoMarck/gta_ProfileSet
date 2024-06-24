@@ -351,26 +351,36 @@ def add_or_remove_mod(profile=None, parameter=None, mod_file=None, option='add')
     # Modloader | Agregar mod al IgnoreMods
     text_ready = ''
     number = 0
-    for line in modloader_ini:
-        # En la linea de inicio se agergaran los mods
-        if number == number_parameter_start:
-            add_line = False
-            for mod in list_mods:
-                text_ready += f'{mod}\n'
-            text_ready += '\n\n'
-        elif number > number_parameter_start:
-            if number > number_parameter_fin:
-                add_line = True
-            else:
+    if not number_parameter_start == len(modloader_ini):
+        # Si la linea del parametro no es la final
+        for line in modloader_ini:
+            # En la linea de inicio se agergaran los mods
+            if number == number_parameter_start:
                 add_line = False
-        else:
-            add_line = True
+                for mod in list_mods:
+                    text_ready += f'{mod}\n'
+                text_ready += '\n\n'
+            elif number > number_parameter_start:
+                if number > number_parameter_fin:
+                    add_line = True
+                else:
+                    add_line = False
+            else:
+                add_line = True
 
-        if add_line == True:
+            if add_line == True:
+                text_ready += f'{line}\n'
+            number += 1
+
+        text_ready = text_ready[:-1]
+    else:
+        # La linea del parametro es la final
+        for line in modloader_ini:
             text_ready += f'{line}\n'
-        number += 1
 
-    text_ready = text_ready[:-1]
+        for mod in list_mods:
+            text_ready += f'{mod}\n'
+
     with open(modloader_file, 'w', encoding=encoding) as text:
         text.write(text_ready)
     return text_ready
@@ -449,6 +459,9 @@ def remove_profile(profile=None):
                 go = True
 
         if go == True:
+            # Establecer perfil al default (Para evitar errores)
+            set_profile('Default')
+
             # Texto modloader
             modloader_ini = get_text_modloader(mode_list=True)
 
@@ -466,16 +479,32 @@ def remove_profile(profile=None):
 
             # Agregar solo el texto, pero excluir el del parametro removido
             text_ready = ''
+            number_line = 0
+            ignore_end_line = 0
+            for line in modloader_ini:
+                # Ignorar parametros del perfil
+                if number_line >= start_number:
+                    if number_line == limit_number:
+                        ignore_end_line = number_line
+                else:
+                    if ignore_end_line == 0:
+                        text_ready += f'{line}\n'
+                number_line += 1
+
+            # Agregar o no lineas da abajo
+            add_line = False
             number = 0
             for line in modloader_ini:
-                if number >= start_number:
-                    if not number <= limit_number:
+                if number > ignore_end_line:
+                    if line.startswith('[Profiles.'):
+                        add_line = True
+
+                    if add_line == True:
                         text_ready += f'{line}\n'
-                else:
-                    text_ready += f'{line}\n'
                 number += 1
             text_ready = text_ready[:-1]
 
+            # Escribir en el archivo
             with open(modloader_file, 'w', encoding=encoding) as text:
                 text.write(text_ready)
 
