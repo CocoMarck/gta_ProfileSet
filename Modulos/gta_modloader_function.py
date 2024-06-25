@@ -320,7 +320,7 @@ def add_or_remove_mod(profile=None, parameter=None, mod_file=None, option='add')
         if mod.startswith(mod_file):
             add_mod = False
             if option == 'add':
-                list_mods.append(mod)
+                list_mods.append(f'{mod}=50')
             elif option == 'remove':
                 pass
         else:
@@ -328,6 +328,8 @@ def add_or_remove_mod(profile=None, parameter=None, mod_file=None, option='add')
 
     if option == 'add':
         if add_mod == True:
+            if parameter == 'Priority':
+                mod_file = f'{mod_file}=50'
             list_mods.append(mod_file)
 
     # Modloader | Detectar Lineas a ignorar
