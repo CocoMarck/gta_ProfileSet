@@ -50,10 +50,10 @@ def get_text_modloader(mode_list=False):
 
 
 
-'''
-Obtener perfil actual
-'''
 def get_current_profile(more_text=False):
+    '''
+    Obtener perfil actual
+    '''
     profile = None
     text_ini = get_text_modloader()
     if not text_ini == None:
@@ -73,11 +73,11 @@ def get_current_profile(more_text=False):
 
 
 
-'''
-Obtener perfiles
-Devuelve en una lista los perfiles
-'''
 def get_profiles():
+    '''
+    Obtener perfiles
+    Devuelve en una lista los perfiles
+    '''
     text_ini = get_text_modloader(mode_list=True)
     if not text_ini == None:
         profiles = []
@@ -92,11 +92,11 @@ def get_profiles():
 
 
 
-'''
-Cambiar perfil
-Establece en el archivo "modloader.ini", el perfil "Profile=El_asignado"
-'''
 def set_profile(profile=None, text_ini=None):
+    '''
+    Cambiar perfil
+    Establece en el archivo "modloader.ini", el perfil "Profile=El_asignado"
+    '''
     good_change = False
     text_ini = get_text_modloader(mode_list=True)
     if not text_ini == None:
@@ -129,10 +129,10 @@ def set_profile(profile=None, text_ini=None):
 
 
 
-'''
-Obtener los mods del juego
-'''
 def get_mods_dirs(path=False):
+    '''
+    Obtener los mods del juego
+    '''
     # Devuelve en una lista las carpetas "main" en modloader
     all_files = Files_List( files='*', path=dir_modloader, remove_path=False)
     dirs = []
@@ -514,3 +514,71 @@ def remove_profile(profile=None):
 #print( get_profile_parameter_listMods(profile='Default', parameter='Priority') )
 #print( remove_profile('Cacas') )
 #input()
+
+
+def change_mod_priority(priority=0, profile=None, mod_file=None):
+    '''
+    Cambiar el valor de pioridad del mod
+    Solo valores enteros mayores a cero, y menores a 250
+    '''
+    number_limit = 250
+    parameter = 'Priority'
+    if (
+        (type(priority) == int) and
+        priority >= 0 and priority <= 250
+    ):
+        list_mod = get_profile_parameter_listMods( profile=profile, parameter=parameter )
+        if not list_mod == []:
+            # Verificar que exista el mod
+            go = False
+            for m in list_mod:
+                if m.startswith(mod_file):
+                    go = True
+
+            # Cambiar pioridad del mod
+            if go == True:
+                modloader_ini = get_text_modloader( mode_list=True )
+                parameter_line_number = get_profile_parameters_line( profile=profile, parameter=parameter )
+
+                # Agregar texto antes de llegar al parametro
+                text_ready = ''
+                number = 0
+                for line in modloader_ini:
+                    if number < parameter_line_number:
+                        text_ready += f'{line}\n'
+                    number += 1
+
+                # Agergar texto despues de llegar al parametro
+                number = 0
+                final_number = None
+                for line in modloader_ini:
+                    if number == parameter_line_number:
+                        text_ready += f'{line}\n'
+                    elif number > parameter_line_number:
+                        if line.startswith( '[Profiles.' ):
+                            if final_number == None:
+                                final_number=number
+                        else:
+                            if final_number == None:
+                                if line.startswith( mod_file ):
+                                    text_ready += f'{mod_file.split('=')[0]}={priority}\n'
+                                else:
+                                    text_ready += f'{line}\n'
+                    number += 1
+
+                # Agregar al terminar con el parametro, el demas texto que falto.
+                number = 0
+                for line in modloader_ini:
+                    if number >= final_number:
+                        text_ready += f'{line}\n'
+                    number += 1
+                text_ready = text_ready[:-1]
+                #print(text_ready)
+                #input()
+
+                # Establecer nuevo texto al modlaoder
+                with open(modloader_file, 'w', encoding=encodign) as text:
+                    text.write(text_ready)
+                return True
+    else:
+        return None
