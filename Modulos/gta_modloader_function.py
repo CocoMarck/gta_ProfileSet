@@ -13,6 +13,7 @@ exe_gta_sa = os.path.join(dir_main, 'gta_sa.exe')
 dir_modloader = os.path.join( dir_main, 'modloader' )
 modloader_file = os.path.join( dir_modloader, 'modloader.ini' )
 encoding = 'utf-8'
+limit_priority = 100
 
 
 
@@ -521,13 +522,13 @@ def remove_profile(profile=None):
 def change_mod_priority(priority=0, profile=None, mod_file=None):
     '''
     Cambiar el valor de pioridad del mod
-    Solo valores enteros mayores a cero, y menores a 250
+    Solo valores enteros mayores a cero, y menores a 100
+    limit_priority = 100 # Esta es una cosntante
     '''
-    number_limit = 250
     parameter = 'Priority'
     if (
         (type(priority) == int) and
-        priority >= 0 and priority <= 250
+        priority > 0 and priority <= limit_priority
     ):
         list_mod = get_profile_parameter_listMods( profile=profile, parameter=parameter )
         if not list_mod == []:
