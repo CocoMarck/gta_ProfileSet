@@ -407,7 +407,6 @@ def menu_change_mod_priority(profile=None, mod_file=None):
     parameter = 'Priority'
     menu_title = Title( get_text('Priority'), print_mode=False )
     menu_mod = f'{profile}: {mod_file}\n'
-    limit = 250
 
     # Loop
     loop = True
@@ -423,7 +422,7 @@ def menu_change_mod_priority(profile=None, mod_file=None):
             option = -1
 
 
-        if option < 0 or option > 250:
+        if option < 1 or option > limit_priority:
             input(
                 f'ERROR {option}\n'
                 f'{get_text("continue_enter")}...'
