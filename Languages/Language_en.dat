@@ -153,3 +153,6 @@ remove=Remove
 
 mods_files=Mod files
 mods_dirs=Mod directories
+add_or_remove=Add or remove
+cfg_priority=Change piority
+priority_value=Priority value

@@ -320,7 +320,7 @@ def add_or_remove_mod(profile=None, parameter=None, mod_file=None, option='add')
         if mod.startswith(mod_file):
             add_mod = False
             if option == 'add':
-                list_mods.append(f'{mod}=50')
+                list_mods.append(f'{mod}')
             elif option == 'remove':
                 pass
         else:
@@ -421,6 +421,8 @@ def add_profile(profile=None):
                 (
                 '\n'
                 f'[Profiles.{profile}.Config]\n'
+                'IgnoreAllMods=false\n'
+                'ExcludeAllMods=false\n'
                 '\n'
                 f'[Profiles.{profile}.Priority]\n'
                 '\n'
@@ -577,7 +579,7 @@ def change_mod_priority(priority=0, profile=None, mod_file=None):
                 #input()
 
                 # Establecer nuevo texto al modlaoder
-                with open(modloader_file, 'w', encoding=encodign) as text:
+                with open(modloader_file, 'w', encoding=encoding) as text:
                     text.write(text_ready)
                 return True
     else:

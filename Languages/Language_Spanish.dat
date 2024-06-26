@@ -150,3 +150,6 @@ remove=Remover
 
 mods_files=Archivos de mods
 mods_dirs=Directorios de mods
+add_or_remove=Agregar o borrar
+cfg_priority=Cambiar prioridad
+priority_value=Valor de prioridad

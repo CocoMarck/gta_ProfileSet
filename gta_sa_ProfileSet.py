@@ -400,6 +400,41 @@ def menu_add_or_remove_profile():
 
 
 
+def menu_change_mod_priority(profile=None, mod_file=None):
+    '''
+    Establecer valor del pioridad del mod
+    '''
+    parameter = 'Priority'
+    menu_title = Title( get_text('Priority'), print_mode=False )
+    menu_mod = f'{profile}: {mod_file}\n'
+    limit = 250
+
+    # Loop
+    loop = True
+    while loop:
+        CleanScreen()
+        try:
+            option = int(input(
+                menu_title +
+                menu_mod +
+                f'{get_text("priority_value")}: '
+            ))
+        except:
+            option = -1
+
+
+        if option < 0 or option > 250:
+            input(
+                f'ERROR {option}\n'
+                f'{get_text("continue_enter")}...'
+            )
+        else:
+            loop = False
+            change_mod_priority(priority=option, profile=profile, mod_file=mod_file)
+            return True
+
+
+
 def menu_mod_priority(profile=None):
     '''
     Configurar pioridad de mod
@@ -443,13 +478,13 @@ def menu_mod_priority(profile=None):
 
                 if not mods == None:
                     CleanScreen()
-                    print( profile )
+                    #print( profile )
                     if type(mods) == list:
                         for mod in mods:
-                            print( mod )
+                            menu_change_mod_priority( profile=profile, mod_file=mod )
                     else:
-                        print( mods )
-                    input()
+                        menu_change_mod_priority(profile=profile, mod_file=mods)
+                    #input()
 
             elif option == 'add_or_remove':
                 # Menu elegir si agregar o remover mod
