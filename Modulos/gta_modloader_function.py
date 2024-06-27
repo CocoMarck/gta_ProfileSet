@@ -93,6 +93,7 @@ def get_profiles():
 
 
 
+
 def set_profile(profile=None, text_ini=None):
     '''
     Cambiar perfil
@@ -127,6 +128,57 @@ def set_profile(profile=None, text_ini=None):
         return text_ready
     else:
         return None
+
+
+
+
+def set_constant_value(profile=None, parameter=None, constant=None, value=None):
+    '''
+    Necesita los sigientes parametros:
+    profile, parameter, constant, value
+    '''
+    modloader_ini = get_text_modloader( mode_list=True )
+    parameter_line_number = get_profile_parameters_line( profile=profile, parameter=parameter )
+
+    # Agregar texto antes de llegar al parametro
+    text_ready = ''
+    number = 0
+    for line in modloader_ini:
+        if number < parameter_line_number:
+            text_ready += f'{line}\n'
+            number += 1
+    # Agergar texto despues de llegar al parametro
+    number = 0
+    final_number = None
+    for line in modloader_ini:
+        if number == parameter_line_number:
+            text_ready += f'{line}\n'
+        elif number > parameter_line_number:
+            if line.startswith( '[Profiles.' ):
+                if final_number == None:
+                    final_number=number
+            else:
+                if final_number == None:
+                    if line.startswith( constant ):
+                        text_ready += f'{constant}={value}\n'
+                    else:
+                        text_ready += f'{line}\n'
+        number += 1
+
+    # Agregar al terminar con el parametro, el demas texto que falto.
+    number = 0
+    for line in modloader_ini:
+        if number >= final_number:
+            text_ready += f'{line}\n'
+        number += 1
+    text_ready = text_ready[:-1]
+    #print(text_ready)
+    #input()
+
+    # Establecer nuevo texto al modlaoder
+    with open(modloader_file, 'w', encoding=encoding) as text:
+        text.write(text_ready)
+
 
 
 
@@ -235,7 +287,8 @@ def get_profile_parameter_Config(profile=None):
 
     dict_parameters = {
         'IgnoreAllMods':None,
-        'ExcludeAllMods':None
+        'ExcludeAllMods':None,
+        'Parents':None
     }
     text_ini_list = get_text_modloader(mode_list=True)
     if profile_line > 0:
@@ -259,9 +312,17 @@ def get_profile_parameter_Config(profile=None):
                     else:
                         dict_parameters['ExcludeAllMods'] = False
 
+                elif line_text.startswith('Parents'):
+                    value = line_text.split('=')[1]
+                    if value.replace(' ', '') == '$None':
+                        dict_parameters['Parents'] = None
+                    else:
+                        dict_parameters['Parents'] = value
+
                 if (
                     (not dict_parameters['IgnoreAllMods'] == None) and
-                    (not dict_parameters['ExcludeAllMods'] == None)
+                    (not dict_parameters['ExcludeAllMods'] == None) and
+                    (not dict_parameters['Parents'] == None)
                 ):
                     loop = False
             else:
@@ -424,6 +485,7 @@ def add_profile(profile=None):
                 f'[Profiles.{profile}.Config]\n'
                 'IgnoreAllMods=false\n'
                 'ExcludeAllMods=false\n'
+                'Parents=$None\n'
                 '\n'
                 f'[Profiles.{profile}.Priority]\n'
                 '\n'
@@ -585,3 +647,39 @@ def change_mod_priority(priority=0, profile=None, mod_file=None):
                 return True
     else:
         return None
+
+
+
+def set_profile_parameter_Config(profile=None, option='', value=''):
+    '''
+    Establecer la configuracion del parametro
+    '''
+    # Obtener configuracion actual, y verificar que la opcion sea correcta
+    dict_config = get_profile_parameter_Config(profile=profile)
+
+    option_set = None
+    for key in dict_config:
+        if key == option:
+            option_set = option
+
+    # Verificar que la opcion y el valor sea correcto.
+    go = False
+    if type(option_set) == str:
+        if (
+            (option_set == 'IgnoreAllMods') or
+            (option_set == 'ExcludeAllMods')
+        ):
+            if type(value) == bool:
+                if not value == dict_config[option_set]:
+                    go = True
+        elif option_set == 'Parents':
+            if type(value) == str:
+                if not value == dict_config[option_set]:
+                    go = True
+
+    # Establecer opcion
+    if go == True:
+        set_constant_value(profile=profile, parameter='Config', constant=option_set, value=value)
+        return True
+    else:
+        return False
