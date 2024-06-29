@@ -517,6 +517,18 @@ def menu_mod_priority(profile=None):
 
 
 
+def get_text_profile_config(profile=None):
+    '''
+    Devolver la configuracion del parametro
+    '''
+    dict_config = get_profile_parameter_Config( profile=profile )
+    text = ''
+    for key in dict_config.keys():
+        text += f"{key}: {dict_config[key]}\n"
+    return text
+
+
+
 
 def menu_config_profile():
     '''
@@ -526,12 +538,14 @@ def menu_config_profile():
     if not profile == None:
         menu_title = Title(f"{get_text('config_profile')} | {profile}", print_mode=False)
         dict_options = {
-            1: 'config_bools',
-            2: 'Priority',
-            3: 'IgnoreFiles',
-            4: 'IgnoreMods',
-            5: 'IncludeMods',
-            6: 'ExclusiveMods',
+            1: 'IgnoreAllMods',
+            2: 'ExcludeAllMods',
+            3: 'Parents',
+            4: 'Priority',
+            5: 'IgnoreFiles',
+            6: 'IgnoreMods',
+            7: 'IncludeMods',
+            8: 'ExclusiveMods',
             0: 'back'
         }
         menu_options = ''
@@ -541,9 +555,11 @@ def menu_config_profile():
         while loop:
             # Mostrar Opciones
             CleanScreen()
+            dict_config = get_profile_parameter_Config(profile=profile)
             try:
                 option = int(input(
                     menu_title +
+                    get_text_profile_config( profile=profile ) +
                     menu_options +
                     option_text_input
                 ))
@@ -560,8 +576,28 @@ def menu_config_profile():
             if go == True:
                 option = dict_options[option]
                 if not option == 'back':
-                    if option == 'config_bools':
-                        input( get_profile_parameter_Config(profile=profile) )
+                    if (
+                        option == 'ExcludeAllMods' or
+                        option == 'IgnoreAllMods'
+                    ):
+                        value = dict_config[option]
+                        if value == False:
+                            set_profile_parameter_Config( profile=profile, option=option, value=True )
+                        elif value == True:
+                            set_profile_parameter_Config( profile=profile, option=option, value=False )
+
+                    elif option == 'Parents':
+                        CleanScreen()
+                        text_for_parents = input(
+                            Title( f'{profile} | {get_text(option)}', print_mode=False) +
+                            f'{get_text("text")}: '
+                        )
+                        value = dict_config[option]
+                        if not text_for_parents == value:
+                            set_profile_parameter_Config(
+                                profile=profile, option=option, value=text_for_parents
+                            )
+
                     elif option == 'Priority':
                         menu_mod_priority( profile=profile )
                         input( get_profile_parameter_listMods(profile=profile, parameter=option) )

@@ -153,3 +153,8 @@ mods_dirs=Directorios de mods
 add_or_remove=Agregar o borrar
 cfg_priority=Cambiar prioridad
 priority_value=Valor de prioridad
+config_parameter=Configurar parametro
+
+ExcludeAllMods=Excluir todos los mods
+IgnoreAllMods=Ignorar todos los mods
+Parents=Padres

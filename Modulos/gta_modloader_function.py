@@ -291,22 +291,34 @@ def get_profile_parameter_Config(profile=None):
         'Parents':None
     }
     text_ini_list = get_text_modloader(mode_list=True)
+
+    # Obtener perfil linea final
+    stop = False
+    number_limit_to_read = 0
+    for line in text_ini_list:
+        if number_limit_to_read > profile_line:
+            if line.startswith('[Profiles.'):
+                stop = True
+        if stop == False:
+            number_limit_to_read += 1
+
+    # Establecer valores en el diccionario de configuracion del parametro
     if profile_line > 0:
         number = 0
         loop = True
         while loop:
             number += 1
-            if profile_line+number < len(text_ini_list):
+            if profile_line+number < number_limit_to_read:
                 line_text = Ignore_Comment( text_ini_list[profile_line+number], ';' )
                 if line_text.startswith('IgnoreAllMods'):
-                    true_or_false = line_text.replace(' ', '').split('=')[1].lower()
+                    true_or_false = (line_text.replace(' ', '').split('=')[1]).lower()
                     if true_or_false == 'true':
                         dict_parameters['IgnoreAllMods'] = True
                     else:
                         dict_parameters['IgnoreAllMods'] = False
 
                 elif line_text.startswith('ExcludeAllMods'):
-                    true_or_false = line_text.replace(' ', '').split('=')[1].lower()
+                    true_or_false = (line_text.replace(' ', '').split('=')[1]).lower()
                     if true_or_false == 'true':
                         dict_parameters['ExcludeAllMods'] = True
                     else:
@@ -602,48 +614,10 @@ def change_mod_priority(priority=0, profile=None, mod_file=None):
 
             # Cambiar pioridad del mod
             if go == True:
-                modloader_ini = get_text_modloader( mode_list=True )
-                parameter_line_number = get_profile_parameters_line( profile=profile, parameter=parameter )
-
-                # Agregar texto antes de llegar al parametro
-                text_ready = ''
-                number = 0
-                for line in modloader_ini:
-                    if number < parameter_line_number:
-                        text_ready += f'{line}\n'
-                    number += 1
-
-                # Agergar texto despues de llegar al parametro
-                number = 0
-                final_number = None
-                for line in modloader_ini:
-                    if number == parameter_line_number:
-                        text_ready += f'{line}\n'
-                    elif number > parameter_line_number:
-                        if line.startswith( '[Profiles.' ):
-                            if final_number == None:
-                                final_number=number
-                        else:
-                            if final_number == None:
-                                if line.startswith( mod_file ):
-                                    text_ready += f'{mod_file.split('=')[0]}={priority}\n'
-                                else:
-                                    text_ready += f'{line}\n'
-                    number += 1
-
-                # Agregar al terminar con el parametro, el demas texto que falto.
-                number = 0
-                for line in modloader_ini:
-                    if number >= final_number:
-                        text_ready += f'{line}\n'
-                    number += 1
-                text_ready = text_ready[:-1]
-                #print(text_ready)
-                #input()
-
-                # Establecer nuevo texto al modlaoder
-                with open(modloader_file, 'w', encoding=encoding) as text:
-                    text.write(text_ready)
+                set_constant_value(
+                    profile=profile, parameter=parameter,
+                    constant=mod_file.split('=')[0], value=priority
+                )
                 return True
     else:
         return None
@@ -672,6 +646,9 @@ def set_profile_parameter_Config(profile=None, option='', value=''):
             if type(value) == bool:
                 if not value == dict_config[option_set]:
                     go = True
+                    value = f'{value}'
+                    value = value.lower()
+
         elif option_set == 'Parents':
             if type(value) == str:
                 if not value == dict_config[option_set]:
