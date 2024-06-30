@@ -587,20 +587,22 @@ def menu_config_profile():
                             set_profile_parameter_Config( profile=profile, option=option, value=False )
 
                     elif option == 'Parents':
+                        go = Continue()
                         CleanScreen()
-                        text_for_parents = input(
-                            Title( f'{profile} | {get_text(option)}', print_mode=False) +
-                            f'{get_text("text")}: '
-                        )
-                        value = dict_config[option]
-                        if not text_for_parents == value:
-                            set_profile_parameter_Config(
-                                profile=profile, option=option, value=text_for_parents
+                        if go == True:
+                            text_for_parents = input(
+                                Title( f'{profile} | {get_text(option)}', print_mode=False) +
+                                f'{get_text("text")}: '
                             )
+                            value = dict_config[option]
+                            if not text_for_parents == value:
+                                set_profile_parameter_Config(
+                                    profile=profile, option=option, value=text_for_parents
+                                )
 
                     elif option == 'Priority':
                         menu_mod_priority( profile=profile )
-                        input( get_profile_parameter_listMods(profile=profile, parameter=option) )
+                        #input( get_profile_parameter_listMods(profile=profile, parameter=option) )
                     else:
                         # Menu elegir si agregar o remover mod
                         add_or_remove = menu_add_or_remove_mod(profile=profile, parameter=option)
@@ -611,28 +613,30 @@ def menu_config_profile():
                                 option == 'IgnoreFiles'
                             ):
                                 # Agregar mods archivos
-                                mods = menu_add_mods('files')
+                                if add_or_remove == 'add':
+                                    mods = menu_add_mods('files')
+                                elif add_or_remove == 'remove':
+                                    mods = menu_profile_set_mod(profile=profile, parameter=option)
                             else:
                                 # Agregar mods tipo carpeta
-                                mods = menu_add_mods('dirs')
+                                if add_or_remove == 'add':
+                                    mods = menu_add_mods('dirs')
+                                else:
+                                    mods = menu_profile_set_mod(profile=profile, parameter=option)
 
                         # Agergar o remover mods
-                        if (
-                            add_or_remove == 'add' or add_or_remove == 'remove'
-                        ):
-                            if not mods == None:
-                                if type(mods) == list:
-                                    for mod in mods:
-                                        add_or_remove_mod(
-                                            profile=profile, parameter=option, mod_file=mod,
-                                            option=add_or_remove
-                                        )
-                                else:
+                        if not mods == None:
+                            if type(mods) == list:
+                                for mod in mods:
                                     add_or_remove_mod(
-                                        profile=profile, parameter=option, mod_file=mods,
+                                        profile=profile, parameter=option, mod_file=mod,
                                         option=add_or_remove
                                     )
-                        input( get_profile_parameter_listMods(profile=profile, parameter=option) )
+                            else:
+                                add_or_remove_mod(
+                                    profile=profile, parameter=option, mod_file=mods,
+                                    option=add_or_remove
+                                )
                 else:
                     loop = False
 
@@ -728,5 +732,12 @@ def menu_main():
             pass
 
 
+
+
 if __name__ == '__main__':
-    menu_main()
+    CleanScreen()
+    test_to_pass = test_to_pass()
+    if test_to_pass == False:
+        input('ERROR - modloader.ini does not exist')
+    elif test_to_pass == True:
+        menu_main()

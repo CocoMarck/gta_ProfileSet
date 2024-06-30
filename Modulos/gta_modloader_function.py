@@ -50,22 +50,49 @@ def get_text_modloader(mode_list=False):
 
 
 
+def get_folder_config_line():
+    '''
+    Obtener linea de [Folder.Config]
+    '''
+    line_folder_config = None
+    number_line = 0
+    text_ini = get_text_modloader(mode_list=True)
+    for line in text_ini:
+        if line.replace(' ', '').startswith('[Folder.Config]'):
+            if line_folder_config == None:
+                line_folder_config = number_line
+        number_line += 1
+
+    return line_folder_config
+
+
+
 
 def get_current_profile(more_text=False):
     '''
     Obtener perfil actual
     '''
+    folder_config_line = get_folder_config_line()
     profile = None
-    text_ini = get_text_modloader()
-    if not text_ini == None:
+    if not folder_config_line == None:
+        text_ini = get_text_modloader(mode_list=True)
         text_ready = ''
-        for line in text_ini.split('\n'):
-            if (
-                line.startswith('Profile')
-            ):
-                line_text = Ignore_Comment(line, ';').replace(' ','')
-                line_profile = line_text.split('=')
-                profile = line_profile[1]
+        number_line = 0
+        loop = True
+        while loop:
+            number_line += 1
+            current_line = folder_config_line+number_line
+            if current_line < len(text_ini):
+                line_text = Ignore_Comment( text_ini[current_line], ';' ).replace(' ', '')
+                if line_text.startswith('[Profiles.'):
+                    loop = False
+                elif line_text.startswith( 'Profile=') :
+                    loop = False
+                    profile = line_text.split('=')[1]
+            else:
+                loop = False
+
+
     if more_text == True and (not profile == None):
         return f'{get_text("current_profile")}: {profile}\n'
     else:
@@ -235,13 +262,10 @@ def get_mods_files():
 
 
 
-'''
-Parametros del perfil
-Estado actual de parametros
-Activar o desactivar parametros
-Obtener y establecer Archivos Ingnorados, Mods Ignorados, Mods Incluidos y Mods Excluidos
-'''
 def get_profile_parameters_line(profile=None, parameter=None):
+    '''
+    Obtener linea de un parametro del perfil
+    '''
     dict_parameter_number = {
         'Config':0,
         'Priority':0,
@@ -273,7 +297,7 @@ def get_profile_parameters_line(profile=None, parameter=None):
         number_line += 1
 
     if parameter == None:
-        return dict_parameter_number
+        return None
     else:
         for key in dict_parameter_number.keys():
             if parameter == key:
@@ -660,3 +684,73 @@ def set_profile_parameter_Config(profile=None, option='', value=''):
         return True
     else:
         return False
+
+
+
+
+
+def test_to_pass():
+    '''
+    Determina si funcionaran las funciones de este modulo
+    '''
+    test_pass = False
+    dict_pass = {
+        'modloader.ini':False,
+        'current_profile':False,
+        'profiles':False
+    }
+    if not get_text_modloader() == None:
+        dict_pass['modloader.ini'] = True
+
+        if not get_current_profile() == None:
+            dict_pass['current_profile'] = True
+
+            profiles = get_profiles()
+            if not profiles == None:
+                if len(profiles) > 0:
+                    default = False
+                    for profile in profiles:
+                        if profile == 'Default':
+                            default = True
+
+                    if default == True:
+                        # Analizar si el perfil default tiene lo necesario para ser compatible.
+                        parameters = [
+                            'Config',
+                            'Priority',
+                            'IgnoreFiles',
+                            'IncludeMods',
+                            'IncludeMods',
+                            'ExclusiveMods'
+                        ]
+                        # Existen los parametros
+                        good = True
+                        for parameter in parameters:
+                            if get_profile_parameters_line(
+                                profile='Default', parameter=parameter
+                            ) == None:
+                                good = False
+                        # El parametro config, tiene los subparametros necesarios
+                        if good == True:
+                            dict_config = get_profile_parameter_Config(profile='Default')
+                            if (
+                                dict_config['ExcludeAllMods'] == None or
+                                dict_config['IgnoreAllMods'] == None
+                            ):
+                                good = False
+
+                        # Verificar que se paso la prueba
+                        if good == True:
+                            dict_pass['profiles'] = True
+                            test_pass = True
+
+    text_message = ''
+    for key in dict_pass.keys():
+        if dict_pass[key] == True:
+            good_or_bad = 'GOOD'
+        else:
+            good_or_bad = 'BAD'
+        text_message += f"{key} {good_or_bad}\n"
+    print(text_message)
+
+    return test_pass
