@@ -132,7 +132,7 @@ def set_profile(profile=None, text_ini=None):
         text_ready = ''
         for line in text_ini:
             if (
-                line.startswith('Profile') and
+                ( line.replace(' ', '') ).startswith('Profile=') and
                 (not profile == None)
             ):
                 line_text = Ignore_Comment(line, ';').replace(' ','')
@@ -142,7 +142,8 @@ def set_profile(profile=None, text_ini=None):
                 if line_profile[1] == profile:
                     pass
                 else:
-                    line = f'{line_profile[0]}={profile}'
+                    if good_change == False:
+                        line = f'{line_profile[0]}={profile}'
                     good_change = True
                 #print(line)
             text_ready += f'{line}\n'
