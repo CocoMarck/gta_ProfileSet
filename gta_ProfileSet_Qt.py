@@ -56,7 +56,6 @@ class Window_Main(QWidget):
         hbox.addStretch()
         vbox_main.addLayout( hbox )
 
-
         hbox = QHBoxLayout()
         hbox.addStretch()
 
@@ -117,6 +116,15 @@ class Dialog_set_something( QDialog ):
     - Parametro de un perfil
     - Mods en la carpeta modloader
     - Mods en los parametros de un perfil
+
+    option=str
+    Aqui se establece lo que se selecionara
+
+    profile=str
+    Si se elige selecionar algun parametro en "option", se necesita de este parametro "profile"
+
+    list_mode=bool
+    Establece si la seleccion podra ser de varias opciones o de solo una opcion.
     '''
     def __init__( self, parent=None, option='set_profile', profile=None, list_mode=True ):
         super().__init__(parent)
@@ -130,6 +138,11 @@ class Dialog_set_something( QDialog ):
         list_options = None
         if option == 'set_profile':
             list_options = get_profiles()
+        elif option == 'mods_files':
+            list_options = get_mods_files()
+        elif option == 'mods_dirs':
+            list_options = get_mods_dirs()
+
         elif (
             option == 'Priority' or
             option == 'IgnoreFiles' or
@@ -138,6 +151,7 @@ class Dialog_set_something( QDialog ):
             option == 'ExcludeMods'
         ):
             list_options = get_profile_parameter_listMods( profile=profile, parameter=option )
+
         if list_options == []:
             list_options = None
 
