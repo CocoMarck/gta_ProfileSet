@@ -161,3 +161,7 @@ config_parameter=Configure parameter
 ExcludeAllMods=Exclude all mods
 IgnoreAllMods=Ignore all mods
 Parents=Parents
+
+ok=Accept
+cancel=Cancel
+set_parameter=Set parameter
