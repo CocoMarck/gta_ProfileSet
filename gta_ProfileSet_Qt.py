@@ -116,7 +116,7 @@ class Window_Main(QWidget):
                         loop = False
             else:
                 dialog_set_profile.close()
-            self.show()
+        self.show()
 
     def set_profile(self):
         # Dialogo de seleccion de perfil, y establecer perfil
