@@ -41,6 +41,10 @@ class Window_Main(QWidget):
         # Secciones verticales - Botones
         vbox_main.addStretch()
 
+        button_start_game = QPushButton( get_text('start') )
+        button_start_game.clicked.connect( self.start_game )
+        vbox_main.addWidget( button_start_game )
+
         button_config_profile = QPushButton( get_text('config_profile') )
         button_config_profile.clicked.connect( self.config_profile )
         vbox_main.addWidget( button_config_profile )
@@ -73,6 +77,10 @@ class Window_Main(QWidget):
 
         # Fin, mostrar todo lo contenido en la Ventana
         self.show()
+
+    def start_game(self):
+        # Ejecutar juego por hilo, subproceso. Sin salirse del launcher
+        execute_game()
 
 
     def config_profile(self):
@@ -131,11 +139,37 @@ class Window_Main(QWidget):
 
     def add_profile(self):
         # Dialogo de texto para Agergar perfil
-        print( 'add' )
+        self.hide()
+        profile, ok = QInputDialog.getText(
+            self,
+            get_text('set_profile'), # Titulo
+            f"{get_text('profile')}:"
+        )
+        if ok and profile:
+            # Agregar perfil, solo si se preciona ok y hay texto en el input
+            add_profile( profile=profile )
+        self.show()
+
 
     def remove_profile(self):
         # Dialogo de Seleccionar y Remover perfil
-        print('remove')
+        self.hide()
+        dialog_set_profile = Dialog_set_something(
+            self, option='set_profile',list_mode=False
+        )
+        dialog_set_profile.exec()
+        if not dialog_set_profile.selected_options == None:
+            # Preguntar si remover o no
+            message_question = QMessageBox.question(
+                self,
+                get_text('remove'), # Titulo
+                f"¿{get_text('remove')}?", # Pregunta
+                QMessageBox.StandardButton.Yes |
+                QMessageBox.StandardButton.No
+            )
+            if message_question == QMessageBox.StandardButton.Yes:
+                remove_profile( profile=dialog_set_profile.selected_options )
+        self.show()
 
 
 
@@ -178,11 +212,12 @@ class Dialog_set_something( QDialog ):
             list_options = get_mods_dirs()
         elif option == 'set_parameter':
             list_options = [
+                'Config',
                 'Priority',
                 'IgnoreFiles',
                 'IgnoreMods',
                 'IncludeMods',
-                'ExclusiveMods',
+                'ExclusiveMods'
             ]
 
         elif (
@@ -190,7 +225,7 @@ class Dialog_set_something( QDialog ):
             option == 'IgnoreFiles' or
             option == 'IgnoreMods' or
             option == 'IncludeMods' or
-            option == 'ExcludeMods'
+            option == 'ExclusiveMods'
         ):
             list_options = get_profile_parameter_listMods( profile=profile, parameter=option )
 
@@ -284,80 +319,103 @@ class Dialog_config_parameter(QDialog):
     '''
     Dialogo para seleccionar si agregar mod o remover mod en el parametro
     Dialogo para cambiar pioridad del mod.
-    Se devuelve la opcion selecionada
+    Se establece la opcion selecionada
     '''
     def __init__(self, parent=None, profile=None, parameter=None):
         super().__init__(parent)
 
-        self.setWindowTitle(
-            f'{ get_text(str(parameter)) } | {profile}'
-        )
+        if not parameter == 'Config':
+            title = f'{ get_text(str(parameter)) } | {profile}'
+        else:
+            title = f'{ get_text('cfg') } | {profile}'
+        self.setWindowTitle(title)
         self.resize( 436, 1 )
 
         # Opcion
         self.option = None
         self.__profile = profile
+        self.__label_mods = QLabel()
         self.__parameter = parameter
 
         # Contenedor Principal
         vbox_main = QVBoxLayout()
         self.setLayout(vbox_main)
 
-        # Scroll de botones
-        scroll_area = QScrollArea()
-        scroll_area.setVerticalScrollBarPolicy(
-            Qt.ScrollBarPolicy.ScrollBarAsNeeded
-        )
-        scroll_area.setWidgetResizable(True)
-        vbox_main.addWidget(scroll_area)
+        # Scroll de opciones, solo si el parametro no es igual a 'Config'
+        if not parameter == 'Config':
+            # Scroll de botones
+            scroll_area = QScrollArea()
+            scroll_area.setVerticalScrollBarPolicy(
+                Qt.ScrollBarPolicy.ScrollBarAsNeeded
+            )
+            scroll_area.setWidgetResizable(True)
+            vbox_main.addWidget(scroll_area)
 
-        # Scroll - Contenedor de labels
-        self.__widget_buttons = QWidget()
-        self.__widget_vbox_main = QVBoxLayout()
-        self.__widget_buttons.setLayout(self.__widget_vbox_main)
+            # Scroll - Contenedor de labels
+            self.__widget_buttons = QWidget()
+            self.__widget_vbox_main = QVBoxLayout()
+            self.__widget_buttons.setLayout(self.__widget_vbox_main)
 
-        # Scroll Layout - labels
-        list_mods = get_profile_parameter_listMods( profile=self.__profile, parameter=self.__parameter )
-        if list_mods == []:
-            list_mods = None
+            # Scroll Layout - labels
+            hbox = QHBoxLayout()
+            hbox.addStretch()
 
-        if not list_mods == None:
-            for mod in get_profile_parameter_listMods( profile=self.__profile, parameter=self.__parameter ):
+            self.__label_mods = QLabel()
+            self.set_label_mods()
+            hbox.addWidget( self.__label_mods )
+
+            hbox.addStretch()
+            self.__widget_vbox_main.addLayout(hbox)
+
+            # Scroll - Agregar el contenedor
+            scroll_area.setWidget( self.__widget_buttons )
+
+
+            # Seccion Vertical de boton de pioridad
+            if parameter == 'Priority':
+                self.__priority = True
+                button_priority = QPushButton( get_text('cfg_priority') )
+                button_priority.clicked.connect( self.change_priority )
+                vbox_main.addWidget( button_priority )
+            else:
+                self.__priority = False
+
+        else:
+            # Opciones de conifguracion de perfil
+            self.__dict_config_label = {}
+            dict_config = get_profile_parameter_Config( profile=profile )
+            for option in ['ExcludeAllMods', 'IgnoreAllMods', 'Parents']:
                 hbox = QHBoxLayout()
+                vbox_main.addLayout(hbox)
+
+                button = QPushButton( get_text(option) )
+                if option == 'ExcludeAllMods' or option == 'IgnoreAllMods':
+                    button.setCheckable( True )
+                    if not dict_config[option] == None:
+                        button.setChecked( dict_config[option] )
+                    button.clicked.connect( partial(self.change_config, option=option, button=button) )
+                elif option == 'Parents':
+                    button.clicked.connect( partial(self.change_config, option=option) )
+                hbox.addWidget( button )
                 hbox.addStretch()
 
-                label = QLabel(mod)
+                label = QLabel( str(dict_config[option]) )
                 hbox.addWidget( label )
 
-                hbox.addStretch()
-                self.__widget_vbox_main.addLayout(hbox)
-
-        # Scroll - Agregar el contenedor
-        scroll_area.setWidget( self.__widget_buttons )
-
-        vbox_main.addStretch()
-
-        # Seccion Vertical de boton de pioridad
-        if parameter == 'Priority':
-            self.__priority = True
-            button_priority = QPushButton( get_text('cfg_priority') )
-            button_priority.clicked.connect( self.change_priority )
-            vbox_main.addWidget( button_priority )
-        else:
-            self.__priority = False
+                self.__dict_config_label.update( {option:label} )
 
         # Seccion Vertical botones de agregar y remover, o cancelar.
-        vbox_main.addStretch()
-        if not parameter == None:
+        button_Cancel = False
+        if (
+            (not parameter == None) and
+            (not parameter == 'Config')
+        ):
             hbox = QHBoxLayout()
             for option in ['add', 'remove']:
                 hbox.addStretch()
                 button = QPushButton( get_text(option) )
 
-                if option == 'add':
-                    button.clicked.connect( self.add )
-                elif option == 'remove':
-                    button.clicked.connect( self.remove )
+                button.clicked.connect( partial( self.add_or_remove, option=option) )
 
                 hbox.addWidget(button)
                 hbox.addStretch()
@@ -365,39 +423,119 @@ class Dialog_config_parameter(QDialog):
             vbox_main.addLayout(hbox)
         else:
             button_cancel = QPushButton( get_text('cancel') )
-            button_cancel.clicked.connect( self.colse )
+            button_cancel.clicked.connect( self.close )
             vbox_main.addWidget(button_cancel)
 
         # Mostrar todo
         self.show()
 
+    def set_label_mods(
+        self,
+        list_mods=None
+    ):
+        # Establecer los mods en el label
+        if list_mods == None:
+            list_mods = get_profile_parameter_listMods( profile=self.__profile, parameter=self.__parameter)
+        text = ''
+        if not list_mods == None:
+            for mod in list_mods:
+                text += f'{mod}\n'
+
+        text = text[:-1]
+        if not self.__label_mods == None:
+            self.__label_mods.setText(text)
+
+    def change_config(self, button=None, option=None):
+        # Cambiar configuracion de perfil
+        if option == 'ExcludeAllMods' or option == 'IgnoreAllMods':
+            if not self.__dict_config_label[option].text() == 'None':
+                if button.isChecked() == False:
+                    value = True
+                elif button.isChecked() == True:
+                    value = False
+                set_profile_parameter_Config( profile=self.__profile, option=option, value=value)
+                self.__dict_config_label[option].setText( str(value) )
+        elif option == 'Parents':
+            # Abrir dialogo de texto y agregar o no texto a Parents
+            try:
+                parents, ok = QInputDialog.getText(
+                    self,
+                    get_text(option),
+                    f"{get_text('text')}:"
+                )
+                if ok and parents:
+                    # Establecer padres de perfil, solo si se preciona ok y hay texto
+                    set_profile_parameter_Config( profile=self.__profile, option=option, value=parents )
+                    self.__dict_config_label[option].setText( parents )
+            except:
+                # Mensaje de error
+                QMessageBox.critical(
+                    self,
+                    'ERROR',
+                    f"{get_text('error_admin')}\n{get_text('error_parameter')}"
+                )
+
     def change_priority(self):
-        self.option = 'change_priority'
-        self.close()
+        # Cambiar pioridad
+        set_mod = Dialog_set_something(
+            self, option=self.__parameter, profile=self.__profile, list_mode=True
+        )
+        set_mod.exec()
+        if not set_mod.selected_options == None:
+            for mod in set_mod.selected_options:
+                # Entrada de texto que solo permite numeros
+                priority, ok = QInputDialog.getInt(
+                    self,
+                    get_text('Priority'),
+                    f'{mod}:'
+                )
+                if ok and priority:
+                    # Cambiar pioridad si se preciona ok, si hay un numero establecido
+                    if priority > limit_priority:
+                        priority = 100
+                    elif priority < 1:
+                        priority = 1
+                    change_mod_priority( priority=priority, profile=self.__profile, mod_file=mod )
 
-    def add(self):
+        # Actualizar labels
+        self.set_label_mods()
+
+    def add_or_remove(self, option='add'):
+        set_mod = None
+
         # Agregar mods
-        self.option = 'add'
+        if option == 'add':
+            if self.__parameter == 'IgnoreFiles':
+                set_mod = Dialog_set_something( self, option='mods_files', list_mode=True )
+            elif not self.__parameter == None:
+                set_mod = Dialog_set_something( self, option='mods_dirs', list_mode=True )
 
-        set_mod = None
-        if self.__parameter == 'IgnoreFiles':
-            set_mod = Dialog_set_something( self, option='mods_files', list_mode=True )
-        elif not self.__parameter == None:
-            set_mod = Dialog_set_something( self, option='mods_dirs', list_mode=True )
+            if not set_mod == None:
+                set_mod.exec()
+                if not set_mod.selected_options == None:
+                    for mod in set_mod.selected_options:
+                        add_or_remove_mod(
+                            profile=self.__profile, parameter=self.__parameter, mod_file=mod,
+                            option='add'
+                        )
 
-        if not set_mod == None:
-            set_mod.exec()
-
-    def remove(self):
         # Remover mods
-        self.option = 'remove'
+        elif option == 'remove':
+            if not self.__parameter == None:
+                set_mod = Dialog_set_something(
+                    self, option=self.__parameter, profile=self.__profile, list_mode=True
+                )
+                set_mod.exec()
+                if not set_mod.selected_options == None:
+                    for mod in set_mod.selected_options:
+                        add_or_remove_mod(
+                            profile=self.__profile, parameter=self.__parameter, mod_file=mod,
+                            option='remove'
+                        )
 
-        set_mod = None
-        if not self.__parameter == None:
-            set_mod = Dialog_set_something(
-                self, option=self.__parameter, profile=self.__profile, list_mode=True
-            )
-            set_mod.exec()
+        # Actualizar lista de mods
+        self.set_label_mods()
+
 
 
 
