@@ -1,10 +1,14 @@
 from Modulos.gta_modloader_function import *
 from Modulos.Modulo_Language import get_text
-import sys
+import sys, os
 from functools import partial
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
+
+
+
+icon_gta_ProfileSet = os.path.join(dir_main, 'gta_ProfileSet.ico')
 
 
 
@@ -19,7 +23,7 @@ class Window_Main(QWidget):
         super().__init__(*args, **kwargs)
 
         self.setWindowTitle('GTA Profile Set')
-        #self.setWindowIcon( QIcon() )
+        self.setWindowIcon( QIcon(icon_gta_ProfileSet) )
         self.resize(256, 1)
 
         # Contenedor principal
@@ -85,7 +89,8 @@ class Window_Main(QWidget):
 
     def config_profile(self):
         # Dialogo de seleccion de perfil, y luego dialogo de configuracion de perfil
-        self.hide()
+        #self.hide()
+
         dialog_set_profile = Dialog_set_something(
             self, option='set_profile', profile=None, list_mode=False
         )
@@ -116,11 +121,13 @@ class Window_Main(QWidget):
                         loop = False
             else:
                 dialog_set_profile.close()
-        self.show()
+
+        #self.show()
 
     def set_profile(self):
         # Dialogo de seleccion de perfil, y establecer perfil
-        self.hide()
+        #self.hide()
+
         dialog_set_profile = Dialog_set_something(
             self, option='set_profile', profile=None, list_mode=False
         )
@@ -135,11 +142,13 @@ class Window_Main(QWidget):
                 self.label_current_profile.setText( get_current_profile(more_text=True) )
         else:
             dialog_set_profile.close()
-        self.show()
+
+        #self.show()
 
     def add_profile(self):
         # Dialogo de texto para Agergar perfil
-        self.hide()
+        #self.hide()
+
         profile, ok = QInputDialog.getText(
             self,
             get_text('set_profile'), # Titulo
@@ -148,12 +157,14 @@ class Window_Main(QWidget):
         if ok and profile:
             # Agregar perfil, solo si se preciona ok y hay texto en el input
             add_profile( profile=profile )
-        self.show()
+
+        #self.show()
 
 
     def remove_profile(self):
         # Dialogo de Seleccionar y Remover perfil
-        self.hide()
+        #self.hide()
+
         dialog_set_profile = Dialog_set_something(
             self, option='set_profile',list_mode=False
         )
@@ -169,7 +180,8 @@ class Window_Main(QWidget):
             )
             if message_question == QMessageBox.StandardButton.Yes:
                 remove_profile( profile=dialog_set_profile.selected_options )
-        self.show()
+
+        #self.show()
 
 
 
@@ -540,7 +552,16 @@ class Dialog_config_parameter(QDialog):
 
 
 if __name__ == '__main__':
-    if test_to_pass() == True:
-        app = QApplication(sys.argv)
+    app = QApplication(sys.argv)
+    app.setWindowIcon( QIcon(icon_gta_ProfileSet) ) # Establecer icono a todo
+    test = test_to_pass()
+    if test == True:
         window = Window_Main()
         sys.exit(app.exec())
+    else:
+        QMessageBox.critical(
+            None,
+            'ERROR',
+            f'{test}',
+
+        )
