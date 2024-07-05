@@ -754,4 +754,7 @@ def test_to_pass():
         text_message += f"{key} {good_or_bad}\n"
     print(text_message)
 
-    return test_pass
+    if test_pass == True:
+        return test_pass
+    else:
+        return text_message
