@@ -140,3 +140,124 @@ def Only_Comment(
     else:
         # No hay nada de comenarios
         return None
+
+
+
+
+def pass_text_filter(text=None,filter=None):
+    '''
+    Devolver si el texto pasa el filtro
+    Los parametros deben ser strings
+
+    filter=str,text=str
+    return bool
+
+    Ejemplo:
+    filtro = '123'
+    text = '312'
+    Final: go = True
+
+    filtro = '123'
+    text = '312.2'
+    Final: go = False
+    '''
+    # Diccionario de caracteres del texto, para saber si el caracter paso el filtro
+    dict_text = {}
+
+    # Bucle por caracter del texto
+    number = 0
+    for character_text in text:
+        number += 1
+        # Bucle por caracter en el filtro
+        # Si el caracter del texto es igual al caracter del filtro, pasa el filtro
+        go =  False
+        for character_filter in filter:
+            if character_text == character_filter:
+                go = True
+
+        dict_text.update( {f'{number}. {character_text}' : go} )
+
+
+    # Evaluar si todos los caracteres pasaron el filtro
+    go = True
+    for key in dict_text.keys():
+        if dict_text[key] == False:
+            go = False
+
+
+    return go
+
+
+
+
+def ignore_text_filter(text=None, filter=None):
+    '''
+    Ignorar los caracteres que no esten en el filtro
+
+    filter=str,text=str
+    return str or None
+    '''
+    text_filter = ''
+    # Bucle por caracter del texto
+    for character_text in text:
+        # Bucle por caracter en el filtro
+        # Si el caracter del texto es igual al caracter del filtro, agergarlo al caracter del texto
+        for character_filter in filter:
+            if character_text == character_filter:
+                text_filter += character_text
+
+    # Devolver el valor text_filter
+    if text_filter == '':
+        return None
+    else:
+        return text_filter
+
+
+
+
+def abc_list(list=None):
+    # Ordenar cada letra del abecedario en un dicionario
+    abc = 'abcdefghijklmnñopqrstuvwxyz'
+    dict_abc = {}
+    number = 0
+    for character in abc:
+        dict_abc.update( {character : number} )
+        number += 1
+    #number -= 1
+
+    # Ordenar en un dicionario
+    # Al detercar con que letra enpieza el item de la lista, ingorar cualquier caracter que no sea abc.
+    # Posicionar cualquier string sin abs a z.
+    dict_ready = {}
+    for key in dict_abc.keys():
+        dict_ready.update( {dict_abc[key]: [] } )
+
+    # Filtros necesarios
+    for text in list:
+        # Filtrar texto
+        text_filter = ignore_text_filter( text=text.replace(' ', '').lower(), filter=abc )
+        if text_filter == None:
+            pass_filter = False
+        else:
+            pass_filter = pass_text_filter( text=text_filter, filter=abc )
+
+        # Si pas el filtro
+        if pass_filter == True:
+            for key in dict_abc.keys():
+                if text_filter.startswith(key):
+                    dict_ready[ dict_abc[key] ].append( text )
+        elif pass_filter == False:
+            dict_ready[ dict_abc['z'] ].append(text)
+
+
+    # Ordenar en base al dicionario ordenado
+    list_ready = []
+    for index in range(0, number):
+        for key in dict_ready.keys():
+            if key == index:
+                if not dict_ready[key] == []:
+                    for item in dict_ready[key]:
+                        list_ready.append( item )
+
+    # Devolver la lista ordenada
+    return list_ready
