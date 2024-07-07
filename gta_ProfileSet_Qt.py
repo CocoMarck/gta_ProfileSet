@@ -219,9 +219,9 @@ class Dialog_set_something( QDialog ):
         if option == 'set_profile':
             list_options = get_profiles()
         elif option == 'mods_files':
-            list_options = get_mods_files()
+            list_options = abc_list( get_mods_files() )
         elif option == 'mods_dirs':
-            list_options = get_mods_dirs()
+            list_options = abc_list( get_mods_dirs() )
         elif option == 'set_parameter':
             list_options = [
                 'Config',
@@ -239,7 +239,10 @@ class Dialog_set_something( QDialog ):
             option == 'IncludeMods' or
             option == 'ExclusiveMods'
         ):
-            list_options = get_profile_parameter_listMods( profile=profile, parameter=option )
+            list_options = abc_list(
+                get_profile_parameter_listMods( profile=profile, parameter=option )
+            )
+
 
         if list_options == []:
             list_options = None
@@ -341,7 +344,7 @@ class Dialog_config_parameter(QDialog):
         else:
             title = f'{ get_text('cfg') } | {profile}'
         self.setWindowTitle(title)
-        self.resize( 436, 1 )
+        self.resize( 256, 256 )
 
         # Opcion
         self.option = None
@@ -448,6 +451,7 @@ class Dialog_config_parameter(QDialog):
         # Establecer los mods en el label
         if list_mods == None:
             list_mods = get_profile_parameter_listMods( profile=self.__profile, parameter=self.__parameter)
+            list_mods = abc_list( list=list_mods)
         text = ''
         if not list_mods == None:
             for mod in list_mods:
