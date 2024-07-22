@@ -261,3 +261,26 @@ def abc_list(list=None):
 
     # Devolver la lista ordenada
     return list_ready
+
+
+
+
+def not_repeat_item( list=None ):
+    '''
+    Elimina los items repetidos en una lista.
+    '''
+    new_list = []
+    for item in list:
+        if new_list == []:
+            new_list.append( item )
+
+        go = True
+        for i in new_list:
+            if i == item:
+                go = False
+
+        if go == True:
+            new_list.append( item )
+
+    return new_list
+#print( not_repeat_item( list=[1,1,1,1,2,3,4,2] ) )

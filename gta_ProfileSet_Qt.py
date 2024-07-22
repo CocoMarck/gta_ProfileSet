@@ -219,7 +219,9 @@ class Dialog_set_something( QDialog ):
         if option == 'set_profile':
             list_options = get_profiles()
         elif option == 'mods_files':
-            list_options = abc_list( get_mods_files() )
+            list_options = not_repeat_item(
+                abc_list( get_mods_files() )
+            )
         elif option == 'mods_dirs':
             list_options = abc_list( get_mods_dirs() )
         elif option == 'set_parameter':
