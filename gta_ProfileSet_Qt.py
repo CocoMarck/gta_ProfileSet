@@ -344,7 +344,7 @@ class Dialog_config_parameter(QDialog):
         if not parameter == 'Config':
             title = f'{ get_text(str(parameter)) } | {profile}'
         else:
-            title = f'{ get_text('cfg') } | {profile}'
+            title = f'{ get_text("cfg") } | {profile}'
         self.setWindowTitle(title)
         self.resize( 256, 256 )
 
