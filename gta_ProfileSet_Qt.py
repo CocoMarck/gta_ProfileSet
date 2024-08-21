@@ -377,7 +377,8 @@ class Dialog_config_parameter(QDialog):
             hbox = QHBoxLayout()
             hbox.addStretch()
 
-            self.__label_mods = QLabel()
+            self.__label_mods = QLabel( )
+            self.__label_mods.setTextInteractionFlags( Qt.TextInteractionFlag.TextSelectableByMouse )
             self.set_label_mods()
             hbox.addWidget( self.__label_mods )
 
