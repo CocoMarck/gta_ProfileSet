@@ -428,7 +428,7 @@ class Dialog_config_parameter(QDialog):
             (not parameter == 'Config')
         ):
             hbox = QHBoxLayout()
-            for option in ['add', 'remove']:
+            for option in ['add', 'custom', 'remove']:
                 hbox.addStretch()
                 button = QPushButton( get_text(option) )
 
@@ -536,6 +536,21 @@ class Dialog_config_parameter(QDialog):
                             profile=self.__profile, parameter=self.__parameter, mod_file=mod,
                             option='add'
                         )
+
+        # Agregar mod custom
+        elif option == 'custom':
+            text, ok = QInputDialog.getText(
+                self,
+                get_text('add'), # Titulo
+                f"{get_text('text')}:"
+            )
+            if ok and text:
+                # Agregar perfil, solo si se preciona ok y hay texto en el input
+                add_or_remove_mod(
+                    profile=self.__profile, parameter=self.__parameter, mod_file=text,
+                    option='add'
+                )
+
 
         # Remover mods
         elif option == 'remove':
