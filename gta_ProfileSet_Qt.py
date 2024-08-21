@@ -254,12 +254,12 @@ class Dialog_set_something( QDialog ):
         self.setLayout(vbox_main)
 
         # Scroll de botones
-        scroll_area = QScrollArea()
-        scroll_area.setVerticalScrollBarPolicy(
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setVerticalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAsNeeded,
         )
-        scroll_area.setWidgetResizable(True) # Para centrer el scroll
-        vbox_main.addWidget(scroll_area)
+        self.scroll_area.setWidgetResizable(True) # Para centrer el scroll
+        vbox_main.addWidget(self.scroll_area)
 
         # Scroll - Contenedor de botones
         widget_buttons = QWidget()
@@ -278,7 +278,14 @@ class Dialog_set_something( QDialog ):
                 widget_vbox_main.addWidget( button )
 
         # Scroll - Agregar el contenedor
-        scroll_area.setWidget(widget_buttons)
+        self.scroll_area.setWidget(widget_buttons)
+
+
+        # Seccion Vertical - Buscar y Seleccionar boton (mod)
+        self.line_edit = QLineEdit(self, placeholderText=get_text('option_search') )
+        self.line_edit.textChanged.connect(self.select_button)
+        vbox_main.addWidget(self.line_edit)
+
 
         # Seccion vertical - Aceptar o cancelar
         self.selected_options = None
@@ -309,6 +316,23 @@ class Dialog_set_something( QDialog ):
             self.kill = True
         else:
             self.kill = False
+
+    def select_button(self):
+        text = self.line_edit.text().lower()
+
+        # Si el campo de texto esta vacio no hacer nada
+        if not text:
+            return
+
+        # Recorrer los botones y seleccionar el mas cercano por inicial
+        for button in self.__list_buttons:
+            if button.text().lower().startswith(text):
+                # Simular el clic en el boton que coincide
+                button.setFocus()
+                self.scroll_area.ensureWidgetVisible(button)
+                self.line_edit.setFocus()
+            else:
+                pass
 
 
     def set_option(self, button):
