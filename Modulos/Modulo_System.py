@@ -1,12 +1,12 @@
 import os
 import platform
 import subprocess
+import ctypes
 from .Modulo_Text import (
     Text_Read,
     Ignore_Comment,
     Text_Separe
 )
-
 
 def get_system():
     '''Para obtener el sistema operativo utilizado'''
@@ -32,6 +32,19 @@ def CleanScreen():
         os.system('cls')
     else:
         os.system('clear')
+
+
+
+def get_display_resolution():
+    '''Retorna la resolucion del sistema'''
+    if system == 'win':
+        user32 = ctypes.windll.user32
+        user32.SetProcessDPIAware()
+        width, height = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+        return [width, height]
+    elif system == 'linux':
+        return [1280, 720]
+
 
 
 def ShowArchive(glob=None):

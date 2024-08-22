@@ -7,7 +7,105 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 
 
+# Establecer dimenciones de windegts y ventana
+display = get_display_resolution()
 
+def get_display_number(multipler=0, divisor=0, based='width'):
+    if based == 'width':
+        base = display[0]
+    else:
+        base = display[1]
+
+    lim_max = max(display)*0.75
+    lim_min = 8
+
+    number = None
+    if multipler > 0:
+        number = base*multipler
+    else:
+        if divisor > 0:
+            number = base/divisor
+
+    if not number == None:
+        if not (
+            (number < lim_min) or
+            (number > lim_max)
+        ):
+            return int(number)
+
+
+
+num_font = get_display_number(divisor=120)
+num_space_padding = int(num_font/3)
+nums_space_margin = [ int(num_font/2), int(num_font/4) ]
+
+nums_win_main = [
+    get_display_number(multipler=0.3, based='width'),
+    get_display_number(multipler=0.3, based='height')
+]
+nums_win_set_something = [
+    get_display_number(multipler=0.25, based='width'),
+    get_display_number(multipler=0.35, based='height')
+]
+nums_win_cfg_param = [
+    get_display_number(multipler=0.25, based='width'),
+    get_display_number(multipler=0.25, based='height')
+]
+
+'''
+print(display)
+print(num_font)
+print(num_space_padding)
+print(nums_space_margin)
+print(nums_win_main)
+print(nums_win_set_something)
+print(nums_win_cfg_param)
+'''
+
+
+
+# Estilo de programa
+style = (
+    'QLabel {\n'
+    f'font-size: {num_font}px;\n'
+
+    f'margin-left: {nums_space_margin[0]}px;\n'
+    f'margin-right: {nums_space_margin[0]}px;\n'
+    f'margin-top: {nums_space_margin[1]}px;\n'
+    f'margin-bottom: {nums_space_margin[1]}px;\n'
+    '}\n'
+
+    'QPushButton {\n'
+    f'font-size: {num_font}px;\n'
+    #f'margin: {nums_space_margin[0]}px;\n' # Espacio entre widgets
+    f'margin-left: {nums_space_margin[0]}px;\n'
+    f'margin-right: {nums_space_margin[0]}px;\n'
+    f'margin-top: {nums_space_margin[1]}px;\n'
+    f'margin-bottom: {nums_space_margin[1]}px;\n'
+
+    f'padding: {num_space_padding}px 10px;\n' # Size adicional para el widget
+
+    #'border-radius: 8px;\n'
+    #'border: 1px solid;\n'
+    '}\n'
+
+
+    'QLineEdit {\n'
+    f'font-size: {num_font}px;\n'
+
+    f'margin-left: {nums_space_margin[0]}px;\n'
+    f'margin-right: {nums_space_margin[0]}px;\n'
+    f'margin-top: {nums_space_margin[1]}px;\n'
+    f'margin-bottom: {nums_space_margin[1]}px;\n'
+
+    f'padding: {num_space_padding}px 10px;\n' # Size adicional para el widget
+    '}\n'
+)
+
+
+
+
+# Programa....
 icon_gta_ProfileSet = os.path.join(dir_main, 'gta_ProfileSet.ico')
 
 
@@ -24,7 +122,7 @@ class Window_Main(QWidget):
 
         self.setWindowTitle('GTA Profile Set')
         self.setWindowIcon( QIcon(icon_gta_ProfileSet) )
-        self.resize(256, 1)
+        self.resize(nums_win_main[0], nums_win_main[1])
 
         # Contenedor principal
         vbox_main = QVBoxLayout()
@@ -210,7 +308,7 @@ class Dialog_set_something( QDialog ):
             self.setWindowTitle( get_text(option) )
         else:
             self.setWindowTitle( f"{get_text(option)} | {profile}" )
-        self.resize(308, 256)
+        self.resize(nums_win_set_something[0], nums_win_set_something[1])
 
         self.__list_mode = list_mode
 
@@ -370,7 +468,7 @@ class Dialog_config_parameter(QDialog):
         else:
             title = f'{ get_text("cfg") } | {profile}'
         self.setWindowTitle(title)
-        self.resize( 256, 256 )
+        self.resize( nums_win_cfg_param[0], nums_win_cfg_param[1] )
 
         # Opcion
         self.option = None
@@ -599,6 +697,7 @@ class Dialog_config_parameter(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setStyleSheet( style )
     app.setWindowIcon( QIcon(icon_gta_ProfileSet) ) # Establecer icono a todo
     test = test_to_pass()
     if test == True:
