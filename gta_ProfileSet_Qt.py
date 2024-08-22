@@ -317,6 +317,7 @@ class Dialog_set_something( QDialog ):
         self.__list_mode = list_mode
 
         # Establecer el continuar o no
+        search = True
         list_options = None
         if option == 'set_profile':
             list_options = get_profiles()
@@ -335,6 +336,7 @@ class Dialog_set_something( QDialog ):
                 'IncludeMods',
                 'ExclusiveMods'
             ]
+            search = False
 
         elif (
             option == 'Priority' or
@@ -350,6 +352,7 @@ class Dialog_set_something( QDialog ):
 
         if list_options == []:
             list_options = None
+            search = False
 
         # Contenedor principal
         vbox_main = QVBoxLayout()
@@ -384,9 +387,10 @@ class Dialog_set_something( QDialog ):
 
 
         # Seccion Vertical - Buscar y Seleccionar boton (mod)
-        self.line_edit = QLineEdit(self, placeholderText=get_text('option_search') )
-        self.line_edit.textChanged.connect(self.select_button)
-        vbox_main.addWidget(self.line_edit)
+        if search == True:
+            self.line_edit = QLineEdit(self, placeholderText=get_text('option_search') )
+            self.line_edit.textChanged.connect(self.select_button)
+            vbox_main.addWidget(self.line_edit)
 
 
         # Seccion vertical - Aceptar o cancelar
