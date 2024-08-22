@@ -8,6 +8,7 @@ from PyQt6.QtCore import Qt
 
 
 # Establecer dimenciones de windegts y ventana
+# Limite de resolucion: Anchura y altura de 480px como minimo.
 display = get_display_resolution()
 
 def get_display_number(multipler=0, divisor=0, based='width'):
@@ -16,8 +17,8 @@ def get_display_number(multipler=0, divisor=0, based='width'):
     else:
         base = display[1]
 
-    lim_max = max(display)*0.75
-    lim_min = 8
+    lim_max = int( max(display)*0.75 )
+    lim_min = 2
 
     number = None
     if multipler > 0:
@@ -27,17 +28,20 @@ def get_display_number(multipler=0, divisor=0, based='width'):
             number = base/divisor
 
     if not number == None:
-        if not (
-            (number < lim_min) or
-            (number > lim_max)
-        ):
+        if number > lim_max:
+            return lim_max
+        elif number < lim_min:
+            return lim_min
+        else:
             return int(number)
 
 
-
 num_font = get_display_number(divisor=120)
-num_space_padding = int(num_font/3)
-nums_space_margin = [ int(num_font/2), int(num_font/4) ]
+num_space_padding = get_display_number(divisor=360)
+nums_space_margin = [
+    get_display_number(divisor=240),
+    get_display_number(divisor=480)
+]
 
 nums_win_main = [
     get_display_number(multipler=0.3, based='width'),
