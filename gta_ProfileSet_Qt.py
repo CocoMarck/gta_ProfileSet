@@ -18,7 +18,7 @@ def get_display_number(multipler=0, divisor=0, based='width'):
         base = display[1]
 
     lim_max = int( max(display)*0.75 )
-    lim_min = 2
+    lim_min = 8
 
     number = None
     if multipler > 0:
@@ -37,10 +37,10 @@ def get_display_number(multipler=0, divisor=0, based='width'):
 
 
 num_font = get_display_number(divisor=120)
-num_space_padding = get_display_number(divisor=360)
+num_space_padding = int(num_font/3)
 nums_space_margin = [
-    get_display_number(divisor=240),
-    get_display_number(divisor=480)
+    int(num_font/2),
+    int(num_font/4)
 ]
 
 nums_win_main = [
@@ -87,7 +87,7 @@ style = (
     f'margin-top: {nums_space_margin[1]}px;\n'
     f'margin-bottom: {nums_space_margin[1]}px;\n'
 
-    f'padding: {num_space_padding}px 10px;\n' # Size adicional para el widget
+    f'padding: {num_space_padding}px;\n' # Size adicional para el widget
 
     #'border-radius: 8px;\n'
     #'border: 1px solid;\n'
@@ -102,7 +102,7 @@ style = (
     f'margin-top: {nums_space_margin[1]}px;\n'
     f'margin-bottom: {nums_space_margin[1]}px;\n'
 
-    f'padding: {num_space_padding}px 10px;\n' # Size adicional para el widget
+    f'padding: {num_space_padding}px;\n' # Size adicional para el widget
     '}\n'
 )
 
