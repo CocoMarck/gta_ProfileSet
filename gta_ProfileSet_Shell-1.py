@@ -133,6 +133,7 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
     # Opcion seleccionada
     dict_options = {}
     text_options = ''
+    list_options = []
     number = 0
     if (
         option == 'return_profile' or
@@ -152,16 +153,16 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
             abc_list( get_mods_dirs )
         )
 
-    #elif (
-    #    option == 'Priority' or
-    #    option == 'IgnoreFiles' or
-    #    option == 'IgnoreMods' or
-    #    option == 'IncludeMods' or
-    #    option == 'ExclusiveMods'
-    #):
-    #    list_options = get_profile_parameter_listMods( profile=profile, parameter=option )
-    #    change_title = True
-    #    title = f'{profile} | {option}'
+    elif (
+        option == 'Priority' or
+        option == 'IgnoreFiles' or
+        option == 'IgnoreMods' or
+        option == 'IncludeMods' or
+        option == 'ExclusiveMods'
+    ):
+        list_options = get_profile_parameter_listMods( profile=profile, parameter=option )
+        change_title = True
+        title = f'{profile} | {option}'
 
     elif option == 'set_parameter':
         list_options = [
@@ -179,6 +180,9 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
         number += 1
         dict_options.update( {number: item} )
         text_options += f'{number}. {item}\n'
+
+    dict_options.update( {0: 'exit'} )
+    text_options += f'0. {get_text("exit")}\n'
 
     prefix = option
 
@@ -201,7 +205,6 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
                 option = int(input(
                     title +
                     text_options +
-                    f'0. {get_text("exit")}\n' +
                     option_text_input
                 ))
             elif set_mode == 'list':
@@ -209,7 +212,6 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
                     input(
                         title +
                         text_options +
-                        f'0. {get_text("exit")}\n' +
                         option_text_input
                     )
                 )
@@ -219,32 +221,39 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
         # Determinar si la opcion es correcta
         go = False
         if option != -1:
-            for key in dict_options.keys():
-                if option == key:
-                    go = True
+            if type(option) == int:
+                for key in dict_options.keys():
+                    if option == key:
+                        go = True
+                        option = dict_options[option]
+
+            elif type(option) == list:
+                options = []
+                for item in option:
+                    for key in dict_options.keys():
+                        if item == key:
+                            go = True
+                            options.append( dict_options[item] )
+                option = options
 
         # Opcion
         if go == True:
-            option = dict_options[option]
-
             loop = False
 
-            if prefix == 'set_profile':
-                set_profile( option )
+            if not option == 'exit':
+                if prefix == 'set_profile':
+                    set_profile( option )
 
-            elif prefix == 'config_profile':
-                menu_set_something( profile=option, option='set_parameter' )
+                elif prefix == 'config_profile':
+                    menu_set_something( profile=option, option='set_parameter' )
 
-            elif prefix == 'set_parameter':
-                menu_config_parameter( profile=profile, parameter=option )
+                elif prefix == 'set_parameter':
+                    menu_config_parameter( profile=profile, parameter=option )
 
-            elif prefix == 'remove_profile':
-                remove_profile( option )
+                elif prefix == 'remove_profile':
+                    remove_profile( option )
 
-            return option
-
-        elif option == 0:
-            loop = False
+                return option
 
 
 
@@ -262,6 +271,14 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
         for key in dict_config.keys():
             list_options.append( key )
         change_options = []
+
+        # Agregar opciones del parametro
+        number = 4
+        for item in list_options:
+            number += 1
+            dict_options.update( {number:item} )
+            text_options += f'{number}. {item}={dict_config[item]}\n'
+
     elif (
         parameter == 'Priority' or
         parameter == 'IgnoreFiles' or
@@ -269,24 +286,21 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
         parameter == 'IncludeMods' or
         parameter == 'ExcludeMods'
     ):
-        change_options = ['add', 'remove']
+        change_options = ['add', 'remove', 'custom']
         list_options = get_profile_parameter_listMods( profile=profile, parameter=parameter )
         if parameter == 'Priority':
             change_options.append('cfg_priority')
 
-    # Agregar opciones del parametro
-    number = 3
-    for item in list_options:
-        number += 1
-        dict_options.update( {number:item} )
-        text_options += f'{number}. {item}\n'
+        # Agregar opciones del parametro
+        for item in list_options:
+            text_options += f'{item}\n'
 
     # Opciones para agergar remover o cambiar mods.
-    number = len(change_options)
+    number = 0
     for item in change_options:
+        number += 1
         dict_options.update( {number: item} )
         text_options += f'{number}. {get_text(item)}    '
-        number -= 1
     text_options += '\n'
 
     # Opcion salir
@@ -300,6 +314,7 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
     # Bucle
     loop = True
     while loop:
+        # Mostrar menu de opciones
         CleanScreen()
         try:
             if set_mode == 'normal':
@@ -317,8 +332,56 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
         except:
             option = -1
 
-        if option == 0:
-            loop = False
+        # Verificar opcion
+        go = False
+        for key in dict_options:
+            if option == key:
+                go = True
+
+        # Opcion seleccionada
+        if go == True:
+            option = dict_options[option]
+            input(option)
+
+            if option == 'add':
+                if parameter == 'IgnoreFiles':
+                    mods = menu_set_something( profile=profile, option='mods_files', set_mode='list' )
+                else:
+                    mods = menu_set_something( profile=profile, option='mods_dirs', set_mode='list' )
+
+                if not (mods == None or mods == []):
+                    for mod in mods:
+                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='add')
+
+            elif option == 'custom':
+                mod = menu_return_text()
+                if not mod == None:
+                    add_or_remove_mod(profile=profile, parameter=parameter, mod_file=mod, option='add')
+
+            elif option == 'remove':
+                mods = menu_set_something( profile=profile, option=parameter, set_mode='list' )
+                for mod in mods:
+                    add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='remove' )
+
+            if option == 'exit':
+                loop = False
+
+            if not change_options == []:
+                # Actualizar opciones
+                text_options = ''
+                list_options = get_profile_parameter_listMods( profile=profile, parameter=parameter )
+                for item in list_options:
+                    text_options += f'{item}\n'
+
+                # Opciones para agergar remover o cambiar mods.
+                number = 0
+                for item in change_options:
+                    number += 1
+                    dict_options.update( {number: item} )
+                    text_options += f'{number}. {get_text(item)}    '
+                text_options += '\n'
+
+                text_options += f'0. {get_text("exit")}\n'
 
 
 
