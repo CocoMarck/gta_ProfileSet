@@ -150,7 +150,7 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
         )
     elif option == 'mods_dirs':
         list_options = not_repeat_item(
-            abc_list( get_mods_dirs )
+            abc_list( get_mods_dirs() )
         )
 
     elif (
@@ -284,7 +284,7 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
         parameter == 'IgnoreFiles' or
         parameter == 'IgnoreMods' or
         parameter == 'IncludeMods' or
-        parameter == 'ExcludeMods'
+        parameter == 'ExclusiveMods'
     ):
         change_options = ['add', 'remove', 'custom']
         list_options = get_profile_parameter_listMods( profile=profile, parameter=parameter )
@@ -363,7 +363,7 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
                 for mod in mods:
                     add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='remove' )
 
-            if option == 'exit':
+            elif option == 'exit':
                 loop = False
 
             if not change_options == []:
@@ -447,4 +447,8 @@ def menu_main():
 
 
 if __name__ == '__main__':
-    menu_main()
+    test = test_to_pass()
+    if test == True:
+        menu_main()
+    else:
+        input('ERROR - modloader.ini does not exist')
