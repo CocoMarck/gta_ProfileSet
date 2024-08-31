@@ -308,7 +308,7 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
     text_options += f'0. {get_text("exit")}\n'
 
     # Titulo
-    title = Title( f'{profile} | {get_text(parameter)}', print_mode=False )
+    title = Title( f'{profile} | {parameter}', print_mode=False )
 
 
     # Bucle
@@ -350,8 +350,11 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
                     mods = menu_set_something( profile=profile, option='mods_dirs', set_mode='list' )
 
                 if not (mods == None or mods == []):
-                    for mod in mods:
-                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='add')
+                    if type(mods) == list:
+                        for mod in mods:
+                            add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='add')
+                    else:
+                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mods, option='add')
 
             elif option == 'custom':
                 mod = menu_return_text()
@@ -362,6 +365,64 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
                 mods = menu_set_something( profile=profile, option=parameter, set_mode='list' )
                 for mod in mods:
                     add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='remove' )
+
+            elif option == 'cfg_priority':
+                mods = menu_set_something( profile=profile, option=parameter, set_mode='list' )
+                if type(mods) == list:
+                    for mod in mods:
+                        CleanScreen()
+                        Title( mod )
+                        try:
+                            number = int(input(
+                                f"{get_text('priority_value')}: "
+                            ))
+                            change_mod_priority(priority=number, profile=profile, mod_file=mod)
+
+                        except:
+                            pass
+                elif type(mods) == str:
+                    CleanScreen()
+                    Title( mods )
+                    try:
+                        number = int(input(
+                            f"{get_text('priority_value')}: "
+                        ))
+                        change_mod_priority(priority=number, profile=profile, mod_file=mods)
+
+                    except:
+                        pass
+
+
+            elif (
+                option == 'IgnoreAllMods' or
+                option == 'ExcludeAllMods' or
+                option == 'Parents'
+            ):
+                dict_config = get_profile_parameter_Config(profile=profile)
+
+                if not option == 'Parents':
+                    value = None
+                    if dict_config[option] == False:
+                        value = True
+                    elif dict_config[option] == True:
+                        value = False
+                else:
+                    value = menu_return_text()
+                set_profile_parameter_Config( profile=profile, option=option, value=value )
+
+                # Opciones de menu
+                list_options = []
+                text_options = ''
+                dict_config = get_profile_parameter_Config( profile=profile )
+                for key in dict_config.keys():
+                    list_options.append( key )
+                number = 4
+                for item in list_options:
+                    number += 1
+                    text_options += f'{number}. {item}={dict_config[item]}\n'
+                text_options += '\n'
+                text_options += f'0. {get_text("exit")}\n'
+
 
             elif option == 'exit':
                 loop = False
