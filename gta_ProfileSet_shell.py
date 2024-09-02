@@ -8,7 +8,6 @@ from Modulos.gta_modloader_function import *
 
 
 
-
 def input_text_to_number(text='0', list_mode=True):
     '''
     Funcion que convierte texto a numero, o a una lista de numeros.
@@ -79,663 +78,448 @@ def input_text_to_number(text='0', list_mode=True):
 
 
 # Texto que sera reutilizado por varias funciones
-option_text_input = f'{ get_text("option") }: '
+option_text_input = f'\n{ get_text("option") }: '
 
 
 
 
-def menu_set_profile():
-    '''
-    Menu seleccionar perfil
-    '''
-    menu_title = Title( f'Modloader {get_text("set_profile")}', print_mode=False )
-    menu_profiles = ''
-    dict_profiles = {}
-    number = 1
-    for profile in get_profiles():
-        menu_profiles += f'{number}. {profile}\n'
-        dict_profiles.update( {number:profile} )
-        number += 1
+# Menu | Retornar texto
+def menu_return_text( title=get_text('text') ):
+    title = Title( text=title, print_mode=False)
 
     loop = True
     while loop:
-        # Mostrar Opciones y establecer opcion
         CleanScreen()
-        try:
-            option = int(input(
-                menu_title +
-                get_current_profile(more_text=True) +
-                menu_profiles +
-                option_text_input
-            ))
-        except:
-            option = -1
+        option = input(
+            title +
+            f'{get_text("text")}: '
+        )
 
+        return_text = Continue()
 
-        # Verificar que la opcion sea correcta.
-        go = False
-        for profile in dict_profiles.keys():
-            if option == profile:
-                go = True
-
-
-        # Establecer perfil o no
-        if go == True:
-            option_continue = Continue()
-            if option_continue == True:
+        if return_text == True:
+            if not option == '':
                 loop = False
-                return dict_profiles[option]
+                return option
             else:
-                pass
+                loop = False
+                return None
         else:
             loop = False
-            CleanScreen()
-            Continue(
-                text=f'{get_text("option")}: {option}',
-                message_error=True
-            )
-            #input(
-            #    'ERROR\n'+
-            #    f"{get_text('continue_enter')}..."
-            #)
             return None
 
 
 
 
-def menu_set_bool():
+# Menu | Selecionar/Config/Remover | Perfil
+def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
     '''
-    Seleccionar el activar las opciones de excluir o ignorar todos los mods
+    Esta Menu puede:
+    establecer un perfil
+    configurar perfil
+    remover perfil
+    solo retornar el perfil.
+
+    establecer mods o mod (directorio o archivo)
     '''
-    pass
+
+    change_title = False
+    if option == 'return_profile':
+        title = 'set_profile'
+    else:
+        title = option
 
 
-def menu_add_mods(option='files'):
-    '''
-    Menu Seleccionar Capetas o archivos de Mods
-    '''
-    menu_title = Title(
-        f"{get_text('select')}: {get_text(f'mods_{option}')}",
-        print_mode=False
-    )
-    menu_options = ''
-    dict_mods_files = {}
-    number = 1
-    if option == 'files':
-        for mod in get_mods_files():
-            dict_mods_files.update( { number: mod } )
-            menu_options += f'{number}. {mod}\n'
-            number += 1
-    elif option == 'dirs':
-        for mod in get_mods_dirs():
-            dict_mods_files.update( { number: mod } )
-            menu_options += f'{number}. {mod}\n'
-            number += 1
-
-    # Loop
-    loop = True
-    while loop:
-        CleanScreen()
-        option = input_text_to_number(
-            input(
-                menu_title +
-                menu_options +
-                option_text_input
-            )
-        )
-        if type(option) == list:
-            mode_list = True
-            selected_option = []
-            for number in option:
-                for key in dict_mods_files.keys():
-                    if number == key:
-                        selected_option.append( dict_mods_files[number] )
-        else:
-            mode_list = False
-            selected_option = None
-            if not(option) == None:
-                for key in dict_mods_files.keys():
-                    if option == key:
-                        selected_option = dict_mods_files[option]
-
-
-        # Devolver Archivos de Mods
-        loop = False
-        if mode_list == True:
-            if selected_option == []:
-                return None
-            else:
-                return selected_option
-        else:
-            return selected_option
-
-
-
-
-def menu_add_or_remove_mod(profile=None, parameter=None):
-    '''
-    Menu para selecionar si agregar o remover mod
-    '''
-    # Texto para menu
-    menu_title = Title(f"{get_text('add')} | {get_text('remove')}" ,print_mode=False)
-    dict_options = {
-        1:'add',
-        2:'remove',
-        0:'back'
-    }
-    menu_options = ''
-    for key in dict_options.keys():
-        menu_options += f"{key}. {get_text(dict_options[key])}\n"
-
-    menu_mods = ''
+    # Opcion seleccionada
+    dict_options = {}
+    text_options = ''
+    list_options = []
+    number = 0
     if (
-        (not parameter == None)and
-        (not profile == None)
+        option == 'return_profile' or
+        option == 'set_profile' or
+        option == 'add_profile' or
+        option == 'remove_profile' or
+        option == 'config_profile'
     ):
-        menu_mods += 'Mods:\n'
-        for mod in get_profile_parameter_listMods(profile=profile, parameter=parameter):
-            menu_mods += f'{mod}\n'
-        menu_mods += '\n'
+        list_options = abc_list( get_profiles() )
 
-    # Loop
+    elif option == 'mods_files':
+        list_options = not_repeat_item(
+            abc_list( get_mods_files() )
+        )
+    elif option == 'mods_dirs':
+        list_options = not_repeat_item(
+            abc_list( get_mods_dirs() )
+        )
+
+    elif (
+        option == 'Priority' or
+        option == 'IgnoreFiles' or
+        option == 'IgnoreMods' or
+        option == 'IncludeMods' or
+        option == 'ExclusiveMods'
+    ):
+        list_options = get_profile_parameter_listMods( profile=profile, parameter=option )
+        change_title = True
+        title = f'{profile} | {option}'
+
+    elif option == 'set_parameter':
+        list_options = [
+            'Config',
+            'Priority',
+            'IgnoreFiles',
+            'IgnoreMods',
+            'IncludeMods',
+            'ExclusiveMods'
+        ]
+        change_title = True
+        title = f'{profile} | {get_text(option)}'
+
+    for item in list_options:
+        number += 1
+        dict_options.update( {number: item} )
+        text_options += f'{number}. {item}\n'
+
+    dict_options.update( {0: 'exit'} )
+    text_options += f'0. {get_text("exit")}\n'
+
+    prefix = option
+
+
+    # Titulo
+    if change_title == False:
+        title = Title( get_text(title), print_mode=False )
+    else:
+        title = Title( title, print_mode=False )
+
+
+
+    # Menu
     loop = True
+
     while loop:
-        # Mostrar opciones
         CleanScreen()
         try:
-            option = int(input(
-                menu_title +
-                menu_mods +
-                menu_options +
-                option_text_input
-            ))
+            if set_mode == 'normal':
+                option = int(input(
+                    title +
+                    text_options +
+                    option_text_input
+                ))
+            elif set_mode == 'list':
+                option = input_text_to_number(
+                    input(
+                        title +
+                        text_options +
+                        option_text_input
+                    )
+                )
         except:
             option = -1
 
-        # Verificar que la opcion seleccionada exista
+        # Determinar si la opcion es correcta
         go = False
-        for key in dict_options.keys():
-            if key == option:
-                go = True
+        if option != -1:
+            if type(option) == int:
+                for key in dict_options.keys():
+                    if option == key:
+                        go = True
+                        option = dict_options[option]
 
-        # Parar loop y Devolver agregar o remover.
+            elif type(option) == list:
+                options = []
+                for item in option:
+                    for key in dict_options.keys():
+                        if item == key:
+                            go = True
+                            options.append( dict_options[item] )
+                option = options
+
+        # Opcion
         if go == True:
             loop = False
-            option = dict_options[option]
-            if option == 'back':
-                return None
-            else:
+
+            if not option == 'exit':
+                if prefix == 'set_profile':
+                    set_profile( option )
+
+                elif prefix == 'config_profile':
+                    menu_set_something( profile=option, option='set_parameter' )
+
+                elif prefix == 'set_parameter':
+                    menu_config_parameter( profile=profile, parameter=option )
+
+                elif prefix == 'remove_profile':
+                    remove_profile( option )
+
                 return option
 
 
 
 
-def menu_profile_set_mod(profile=None, parameter=None):
-    menu_title = Title( f"{get_text('set')} Mod", print_mode=False)
-
+def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
+    '''
+    Para configurar un parametro de un perfil
+    '''
+    # Opciones
     dict_options = {}
-    menu_options = ''
-    mods = get_profile_parameter_listMods( profile=profile, parameter=parameter )
-    number = 0
-    if not mods == []:
-        loop = True
-        for mod in mods:
+    text_options = ''
+    list_options = []
+    if parameter == 'Config':
+        dict_config = get_profile_parameter_Config( profile=profile )
+        for key in dict_config.keys():
+            list_options.append( key )
+        change_options = []
+
+        # Agregar opciones del parametro
+        number = 4
+        for item in list_options:
             number += 1
-            dict_options.update( {number:mod} )
-            menu_options += f'{number}. {mod}\n'
-    else:
-        loop = False
-    dict_options.update( {0:'back'} )
-    menu_options += f'0. {get_text("back")}\n'
+            dict_options.update( {number:item} )
+            text_options += f'{number}. {item}={dict_config[item]}\n'
+
+    elif (
+        parameter == 'Priority' or
+        parameter == 'IgnoreFiles' or
+        parameter == 'IgnoreMods' or
+        parameter == 'IncludeMods' or
+        parameter == 'ExclusiveMods'
+    ):
+        change_options = ['add', 'remove', 'custom']
+        list_options = get_profile_parameter_listMods( profile=profile, parameter=parameter )
+        if parameter == 'Priority':
+            change_options.append('cfg_priority')
+
+        # Agregar opciones del parametro
+        for item in list_options:
+            text_options += f'{item}\n'
+
+    # Opciones para agergar remover o cambiar mods.
+    number = 0
+    for item in change_options:
+        number += 1
+        dict_options.update( {number: item} )
+        text_options += f'{number}. {get_text(item)}    '
+    text_options += '\n'
+
+    # Opcion salir
+    dict_options.update( {0: 'exit'} )
+    text_options += f'0. {get_text("exit")}\n'
+
+    # Titulo
+    title = Title( f'{profile} | {parameter}', print_mode=False )
+
 
     # Bucle
+    loop = True
     while loop:
+        # Mostrar menu de opciones
         CleanScreen()
-        option = input_text_to_number(input(
-            menu_title +
-            menu_options +
-            option_text_input
-        ))
+        try:
+            if set_mode == 'normal':
+                option = int(input(
+                    title +
+                    text_options +
+                    option_text_input
+                ))
+            else:
+                option = input_text_to_number(text=input(
+                    title +
+                    text_options +
+                    option_text_input
+                ))
+        except:
+            option = -1
 
         # Verificar opcion
         go = False
-        if type(option) == list:
-            mode_list = True
-            list_option = []
-            for number in option:
-                for key in dict_options.keys():
-                    if key == number:
-                        list_option.append(number)
-            if not list_option == []:
-                option = list_option[0]
+        for key in dict_options:
+            if option == key:
                 go = True
-        else:
-            mode_list = False
+
+        # Opcion seleccionada
+        if go == True:
+            option = dict_options[option]
+            #input(option)
+
+            if option == 'add':
+                if parameter == 'IgnoreFiles':
+                    mods = menu_set_something( profile=profile, option='mods_files', set_mode='list' )
+                else:
+                    mods = menu_set_something( profile=profile, option='mods_dirs', set_mode='list' )
+
+                if not (mods == None or mods == []):
+                    if type(mods) == list:
+                        for mod in mods:
+                            add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='add')
+                    else:
+                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mods, option='add')
+
+            elif option == 'custom':
+                mod = menu_return_text()
+                if not mod == None:
+                    add_or_remove_mod(profile=profile, parameter=parameter, mod_file=mod, option='add')
+
+            elif option == 'remove':
+                mods = menu_set_something( profile=profile, option=parameter, set_mode='list' )
+                if type(mods) == list:
+                    for mod in mods:
+                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='remove' )
+                elif type(mods) == str:
+                    add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='remove' )
+
+            elif option == 'cfg_priority':
+                mods = menu_set_something( profile=profile, option=parameter, set_mode='list' )
+                if type(mods) == list:
+                    for mod in mods:
+                        CleanScreen()
+                        Title( mod )
+                        try:
+                            number = int(input(
+                                f"{get_text('priority_value')}: "
+                            ))
+                            change_mod_priority(priority=number, profile=profile, mod_file=mod)
+
+                        except:
+                            pass
+                elif type(mods) == str:
+                    CleanScreen()
+                    Title( mods )
+                    try:
+                        number = int(input(
+                            f"{get_text('priority_value')}: "
+                        ))
+                        change_mod_priority(priority=number, profile=profile, mod_file=mods)
+
+                    except:
+                        pass
+
+
+            elif (
+                option == 'IgnoreAllMods' or
+                option == 'ExcludeAllMods' or
+                option == 'Parents'
+            ):
+                dict_config = get_profile_parameter_Config(profile=profile)
+
+                if not option == 'Parents':
+                    value = None
+                    if dict_config[option] == False:
+                        value = True
+                    elif dict_config[option] == True:
+                        value = False
+                else:
+                    value = menu_return_text()
+                set_profile_parameter_Config( profile=profile, option=option, value=value )
+
+                # Opciones de menu
+                list_options = []
+                text_options = ''
+                dict_config = get_profile_parameter_Config( profile=profile )
+                for key in dict_config.keys():
+                    list_options.append( key )
+                number = 4
+                for item in list_options:
+                    number += 1
+                    text_options += f'{number}. {item}={dict_config[item]}\n'
+                text_options += '\n'
+                text_options += f'0. {get_text("exit")}\n'
+
+
+            elif option == 'exit':
+                loop = False
+
+            if not change_options == []:
+                # Actualizar opciones
+                text_options = ''
+                list_options = get_profile_parameter_listMods( profile=profile, parameter=parameter )
+                for item in list_options:
+                    text_options += f'{item}\n'
+
+                # Opciones para agergar remover o cambiar mods.
+                number = 0
+                for item in change_options:
+                    number += 1
+                    dict_options.update( {number: item} )
+                    text_options += f'{number}. {get_text(item)}    '
+                text_options += '\n'
+
+                text_options += f'0. {get_text("exit")}\n'
+
+
+
+
+# Menu principal | Loop Principal
+#python .\gta_ProfileSet_Shell-1.py
+def menu_main():
+    dict_options = {
+        1:'start',
+        2:'config_profile',
+        3:'set_profile',
+        4:'add_profile',
+        5:'remove_profile',
+        0:'exit'
+    }
+    text_options = ''
+    for key in dict_options.keys():
+        text_options += f'{key}. { get_text(dict_options[key]) }\n'
+    title = Title('GTA Profile Set', print_mode=False)
+
+    loop = True
+    while loop:
+        CleanScreen()
+        try:
+            option = int(input(
+                title +
+                f'{get_text("current_profile")}: {get_current_profile()}\n\n' +
+                text_options +
+                option_text_input
+            ))
+        except:
+            option = -1
+
+        go = False
+        if option != -1:
             for key in dict_options.keys():
                 if key == option:
                     go = True
 
-        # Establecer opcion
         if go == True:
             option = dict_options[option]
-            if option == 'back':
-                loop = False
-            else:
-                if mode_list == True:
-                    new_list = []
-                    for number in list_option:
-                        new_list.append( dict_options[number] )
-                    return new_list
-                else:
-                    return option
+            #input( option )
 
-
-
-
-def menu_add_or_remove_profile():
-    '''
-    Menu agregar o remover perfil
-    '''
-    menu_title = Title( get_text('add_or_remove_profile'), print_mode=False )
-    dict_options = {
-        1:'add',
-        2:'remove',
-        0:'back'
-    }
-    menu_options = ''
-    for key in dict_options.keys():
-        menu_options += f"{key}. {get_text(dict_options[key])}\n"
-
-    # Loop
-    loop = True
-    while loop:
-        CleanScreen()
-        try:
-            option = int(input(
-                menu_title +
-                menu_options +
-                option_text_input
-            ))
-        except:
-            option = -1
-
-        # Verificar opcion correcta
-        go = False
-        for key in dict_options.keys():
-            if key == option:
-                go = True
-
-
-        # Establecer opcion
-        if go == True:
-            option = dict_options[option]
-            profile = None
-            if option == 'add':
-                CleanScreen()
-                profile = input(
-                    f"{get_text(option)}\n"
-                    f"{get_text('profile')}: "
-                )
-
-            elif option == 'remove':
-                profile = menu_set_profile()
-
-            elif option == 'back':
-                loop = False
-
-            if not profile == None:
-                if not profile == None:
-                    CleanScreen()
-                    if Continue(
-                        menu_title +
-                        f"{get_text(option)}?"
-                    ) == True:
-                        if option == 'add':
-                            add_profile(profile=profile)
-                        elif option == 'remove':
-                            remove_profile(profile=profile)
-            else:
-                loop = False
-
-
-
-
-def menu_change_mod_priority(profile=None, mod_file=None):
-    '''
-    Establecer valor del pioridad del mod
-    '''
-    parameter = 'Priority'
-    menu_title = Title( get_text('Priority'), print_mode=False )
-    menu_mod = f'{profile}: {mod_file}\n'
-
-    # Loop
-    loop = True
-    while loop:
-        CleanScreen()
-        try:
-            option = int(input(
-                menu_title +
-                menu_mod +
-                f'{get_text("priority_value")}: '
-            ))
-        except:
-            option = -1
-
-
-        if option < 1 or option > limit_priority:
-            input(
-                f'ERROR {option}\n'
-                f'{get_text("continue_enter")}...'
-            )
-        else:
-            loop = False
-            change_mod_priority(priority=option, profile=profile, mod_file=mod_file)
-            return True
-
-
-
-def menu_mod_priority(profile=None):
-    '''
-    Configurar pioridad de mod
-    '''
-    menu_title = Title( get_text('Priority'), print_mode=False )
-    dict_options = {
-        1:'cfg_priority',
-        2:'add_or_remove',
-        0:'back'
-    }
-    menu_options = ''
-    for key in dict_options.keys():
-        menu_options += f'{key}. {get_text(dict_options[key])}\n'
-
-    # Loop
-    loop = True
-    while loop:
-        CleanScreen()
-        try:
-            option = int(input(
-                menu_title +
-                menu_options +
-                option_text_input
-            ))
-        except:
-            option = -1
-
-        # Verificar opcion
-        go = False
-        for key in dict_options.keys():
-            if key == option:
-                go = True
-
-        # Establecer opcion
-        if go == True:
-            parameter='Priority'
-            option = dict_options[option]
-            if option == 'cfg_priority':
-                # Menu configurar pioridad
-                mods = menu_profile_set_mod(profile=profile, parameter=parameter)
-
-                if not mods == None:
-                    CleanScreen()
-                    #print( profile )
-                    if type(mods) == list:
-                        for mod in mods:
-                            menu_change_mod_priority( profile=profile, mod_file=mod )
-                    else:
-                        menu_change_mod_priority(profile=profile, mod_file=mods)
-                    #input()
-
-            elif option == 'add_or_remove':
-                # Menu elegir si agregar o remover mod
-                add_or_remove = menu_add_or_remove_mod(profile=profile, parameter=parameter)
-                mods = None
-
-                if not add_or_remove == None:
-                    # Agregar mods tipo carpeta
-                    mods = menu_add_mods('dirs')
-
-                # Agergar o remover mods
-                if (
-                    add_or_remove == 'add' or add_or_remove == 'remove'
-                ):
-                    if not mods == None:
-                        if type(mods) == list:
-                            for mod in mods:
-                                add_or_remove_mod(
-                                    profile=profile, parameter=parameter, mod_file=mod,
-                                    option=add_or_remove
-                                )
-                        else:
-                            add_or_remove_mod(
-                                profile=profile, parameter=parameter, mod_file=mods,
-                                option=add_or_remove
-                            )
-                input( get_profile_parameter_listMods(profile=profile, parameter=parameter) )
-
-            else:
-                loop = False
-
-
-
-def get_text_profile_config(profile=None):
-    '''
-    Devolver la configuracion del parametro
-    '''
-    dict_config = get_profile_parameter_Config( profile=profile )
-    text = ''
-    for key in dict_config.keys():
-        text += f"{key}: {dict_config[key]}\n"
-    return text
-
-
-
-
-def menu_config_profile():
-    '''
-    Manu Configurar perfil
-    '''
-    profile = menu_set_profile()
-    if not profile == None:
-        menu_title = Title(f"{get_text('config_profile')} | {profile}", print_mode=False)
-        dict_options = {
-            1: 'IgnoreAllMods',
-            2: 'ExcludeAllMods',
-            3: 'Parents',
-            4: 'Priority',
-            5: 'IgnoreFiles',
-            6: 'IgnoreMods',
-            7: 'IncludeMods',
-            8: 'ExclusiveMods',
-            0: 'back'
-        }
-        menu_options = ''
-        for option in dict_options.keys():
-            menu_options += f"{option}. { get_text(dict_options[option]) }\n"
-        loop = True
-        while loop:
-            # Mostrar Opciones
-            CleanScreen()
-            dict_config = get_profile_parameter_Config(profile=profile)
-            try:
-                option = int(input(
-                    menu_title +
-                    get_text_profile_config( profile=profile ) +
-                    menu_options +
-                    option_text_input
-                ))
-            except:
-                option = -1
-
-            # Verificar que la Opcion este correta
-            go = False
-            for key in dict_options.keys():
-                if option == key:
-                    go = True
-
-            # Accionar opcion
-            if go == True:
-                option = dict_options[option]
-                if not option == 'back':
-                    if (
-                        option == 'ExcludeAllMods' or
-                        option == 'IgnoreAllMods'
-                    ):
-                        value = dict_config[option]
-                        if value == False:
-                            set_profile_parameter_Config( profile=profile, option=option, value=True )
-                        elif value == True:
-                            set_profile_parameter_Config( profile=profile, option=option, value=False )
-
-                    elif option == 'Parents':
-                        go = Continue()
-                        CleanScreen()
-                        if go == True:
-                            text_for_parents = input(
-                                Title( f'{profile} | {get_text(option)}', print_mode=False) +
-                                f'{get_text("text")}: '
-                            )
-                            value = dict_config[option]
-                            if not text_for_parents == value:
-                                set_profile_parameter_Config(
-                                    profile=profile, option=option, value=text_for_parents
-                                )
-
-                    elif option == 'Priority':
-                        menu_mod_priority( profile=profile )
-                        #input( get_profile_parameter_listMods(profile=profile, parameter=option) )
-                    else:
-                        # Menu elegir si agregar o remover mod
-                        add_or_remove = menu_add_or_remove_mod(profile=profile, parameter=option)
-                        mods = None
-
-                        if not add_or_remove == None:
-                            if (
-                                option == 'IgnoreFiles'
-                            ):
-                                # Agregar mods archivos
-                                if add_or_remove == 'add':
-                                    mods = menu_add_mods('files')
-                                elif add_or_remove == 'remove':
-                                    mods = menu_profile_set_mod(profile=profile, parameter=option)
-                            else:
-                                # Agregar mods tipo carpeta
-                                if add_or_remove == 'add':
-                                    mods = menu_add_mods('dirs')
-                                else:
-                                    mods = menu_profile_set_mod(profile=profile, parameter=option)
-
-                        # Agergar o remover mods
-                        if not mods == None:
-                            if type(mods) == list:
-                                for mod in mods:
-                                    add_or_remove_mod(
-                                        profile=profile, parameter=option, mod_file=mod,
-                                        option=add_or_remove
-                                    )
-                            else:
-                                add_or_remove_mod(
-                                    profile=profile, parameter=option, mod_file=mods,
-                                    option=add_or_remove
-                                )
-                else:
-                    loop = False
-
-
-
-
-def menu_execute_game(always_exec=True):
-    '''
-    Ejecutar juego
-    always_exec, establece si siempre ejcutar aunque elijas no en el input "salir y ejecutar"
-    '''
-    CleanScreen()
-    menu_title = Title( get_text('exec'), print_mode=False )
-    exec_and_exit = Continue(
-        menu_title +
-        get_current_profile(more_text=True) +
-        f'{get_text("exit_and_exec_game")}?'
-    )
-    if exec_and_exit == True:
-        execute_game()
-    else:
-        if always_exec == True:
-            execute_game()
-    return exec_and_exit
-
-
-
-
-
-# Menu Loop
-def menu_main():
-    '''
-    El menu Main
-    '''
-    menu_title = Title( text=f'GTA Profile Set', print_mode=False)
-    dict_options = {
-        1 : 'start',
-        2 : 'set_profile',
-        3 : 'config_profile',
-        4 : 'add_or_remove_profile',
-        0 : 'exit'
-    }
-    menu_options = ''
-    for option in dict_options.keys():
-        menu_options += f'{option}. {get_text( dict_options[option] )}\n'
-
-
-    loop = True
-    while loop:
-        # Mostrar Opciones y establecer opcion
-        CleanScreen()
-        try:
-            option = int(input(
-                menu_title +
-                get_current_profile(more_text=True) +
-                menu_options +
-                option_text_input
-            ))
-        except:
-            option = -1
-
-
-
-        # Verificar opcion
-        go = False
-        for dict_option in dict_options.keys():
-            if option == dict_option:
-                go = True
-
-        # Establecer ocion
-        if go == True:
-            option = dict_options[option]
             if option == 'start':
-                if menu_execute_game(True) == True:
-                    loop = False
-
-            elif option == 'set_profile':
-                profile = menu_set_profile()
-                if not profile == None:
-                    set_profile( profile=profile, text_ini=get_text_modloader() )
-                    if menu_execute_game(False) == True:
-                        loop = False
+                execute_game()
 
             elif option == 'config_profile':
-                menu_config_profile()
+                #menu_set_something( option=option )
+                profile = menu_set_something( option='set_profile' )
+                if type(profile) == str:
+                    loop_config = True
+                    while loop_config:
+                        parameter = menu_set_something( profile=profile, option='set_parameter' )
+                        if parameter == 'exit' or parameter == None:
+                            loop_config = False
+                        else:
+                            pass
 
-            elif option == 'add_or_remove_profile':
-                menu_add_or_remove_profile()
+            elif option == 'set_profile':
+                menu_set_something(option=option)
+
+            elif option == 'add_profile':
+                profile = menu_return_text( title=get_text(option) )
+                if not profile == None:
+                    add_profile( profile=profile )
+
+            elif option == 'remove_profile':
+                menu_set_something(option=option)
 
             elif option == 'exit':
                 loop = False
-        else:
-            pass
-
-
 
 
 if __name__ == '__main__':
-    CleanScreen()
     test = test_to_pass()
     if test == True:
         menu_main()
