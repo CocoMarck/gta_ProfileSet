@@ -1,0 +1,132 @@
+# Portuguese
+# Opções gerais
+YesNo=Sim,Não
+option=Opção
+set_option=Selecione uma opção
+see_options=Ver todas as opções
+start=Iniciar
+stop=Parar
+exit=Sair
+optional=Opcional
+of=de
+
+
+# Continuar
+continuar=Continuar
+continue_enter=Pressione Enter para continuar
+
+
+# Diretório - pastas
+set_dir=Escolha o diretório
+dir=Diretório
+exclude_dirs=Excluir diretórios
+dir_main=Diretório principal
+error_dir=Diretório errado
+
+
+# Arquivos
+set_arch=Definir o arquivo
+no_arch=Nenhum arquivo
+save_arch=Salvar arquivo
+arch=Arquivo
+
+
+# Contexto
+view_cfg=Ver configuração criada
+the_cfg_be=A configuração será
+cfg=Configuração
+
+
+
+# Terminar
+finalizado=Finalizado
+fin_install=Instalação concluída
+bye=Até a próxima
+
+# Erros
+error_admin=Você precisa de permissões de administrador
+error_parameter=Algum parâmetro está incorreto
+
+# Ajuda
+help_wait=Por favor aguarde
+help=Ajuda
+
+
+# Conecte e desconecte
+connect_status=Status da conexão
+
+# Por padrão
+default=Padrão
+
+# Texto, leia e escreva
+read_only=Somente leitura
+
+#Sincronizar
+sync=Sincronizar
+start&sync=Iniciar e sincronizar
+
+# Cadastre-se ou faça login
+login=Entrar
+
+
+# Escolha ou defina
+set=Definir
+no_set=Não definido
+yes_set=Definir
+select=Selecionar
+
+# Grave ou reproduza
+record=Registro
+rec_video=Gravar vídeo
+rec_audio=Gravar áudio
+reproduce=Jogar
+
+# Desempenho, qualidade, estatísticas de hardware
+resolotion=Resolução
+quality=Qualidade
+fps=Quadros por segundo
+cpu_use=Uso da CPU
+
+text=Texto
+
+
+# Lançador GTA sa
+exit_and_exec_game=Sair e executar o jogo
+current_profile=Perfil atual
+enter_to_start=Pressione Enter para iniciar
+set_profile=Selecionar perfil
+config_profile=Configurar perfil
+config_bools=Configurar Booleanos
+add_or_remove_profile=Adicionar ou remover perfil
+profile=Perfil
+
+Priority=Prioridade do mod
+IgnoreFiles=Arquivos ignorados
+IgnoreMods=Modificações ignoradas
+IncludeMods=Modificações incluídas
+ExclusiveMods=Mods Exclusivos
+
+back=Voltar
+add=Adicionar
+remove=Remover
+
+mods_files=Arquivos mod
+mods_dirs=Diretórios de mods
+add_or_remove=Adicionar ou excluir
+cfg_priority=Alterar prioridade
+prioridade_value=Valor de prioridade
+config_parameter=Configurar parâmetro
+
+ExcludeAllMods=Excluir todos os mods
+IgnoreAllMods=Ignorar todos os mods
+Parents=Pais
+
+ok=Aceitar
+cancel=Cancelar
+set_parameter=Definir parâmetro
+
+custom=Personalizado
+option_search=Encontre uma opção
+
+add_profile=Adicionar perfil
+remove_profile=Remover perfil

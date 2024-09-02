@@ -168,3 +168,6 @@ set_parameter=Set parameter
 
 custom=Custom
 option_search=Search an option
+
+add_profile=Add profile
+remove_profile=Remove profile

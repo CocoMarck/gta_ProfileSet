@@ -165,3 +165,6 @@ set_parameter=Establecer parametro
 
 custom=Personalizado
 option_search=Buscar una opcion
+
+add_profile=Agragar perfil
+remove_profile=Remover perfil
