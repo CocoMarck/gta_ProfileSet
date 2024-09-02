@@ -160,7 +160,9 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
         option == 'IncludeMods' or
         option == 'ExclusiveMods'
     ):
-        list_options = get_profile_parameter_listMods( profile=profile, parameter=option )
+        list_options = abc_list(
+            get_profile_parameter_listMods( profile=profile, parameter=option )
+        )
         change_title = True
         title = f'{profile} | {option}'
 
@@ -493,7 +495,7 @@ def menu_main():
 
             elif option == 'config_profile':
                 #menu_set_something( option=option )
-                profile = menu_set_something( option='set_profile' )
+                profile = menu_set_something( option='return_profile' )
                 if type(profile) == str:
                     loop_config = True
                     while loop_config:
