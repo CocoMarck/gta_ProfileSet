@@ -349,25 +349,11 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
                 else:
                     mods = menu_set_something( profile=profile, option='mods_dirs', set_mode='list' )
 
-                if not (mods == None or mods == []):
-                    if type(mods) == list:
-                        for mod in mods:
-                            add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='add')
-                    else:
-                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mods, option='add')
-
             elif option == 'custom':
-                mod = menu_return_text()
-                if not mod == None:
-                    add_or_remove_mod(profile=profile, parameter=parameter, mod_file=mod, option='add')
+                mods = menu_return_text()
 
             elif option == 'remove':
                 mods = menu_set_something( profile=profile, option=parameter, set_mode='list' )
-                if type(mods) == list:
-                    for mod in mods:
-                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='remove' )
-                elif type(mods) == str:
-                    add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option='remove' )
 
             elif option == 'cfg_priority':
                 mods = menu_set_something( profile=profile, option=parameter, set_mode='list' )
@@ -429,6 +415,19 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
 
             elif option == 'exit':
                 loop = False
+
+
+            if option == 'custom' or option == 'remove' or option == 'add':
+                if option == 'custom':
+                    option = 'add'
+
+                if type(mods) == list:
+                    for mod in mods:
+                        add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mod, option=option )
+                elif type(mods) == str:
+                    add_or_remove_mod( profile=profile, parameter=parameter, mod_file=mods, option=option )
+
+
 
             if not change_options == []:
                 # Actualizar opciones
@@ -517,6 +516,8 @@ def menu_main():
 
             elif option == 'exit':
                 loop = False
+
+
 
 
 if __name__ == '__main__':
