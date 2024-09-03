@@ -177,7 +177,7 @@ class Window_Main(QWidget):
             elif option == 'remove':
                 button.clicked.connect( self.remove_profile )
             hbox.addWidget(button)
-            hbox.addStretch()
+            #hbox.addStretch()
         vbox_main.addLayout(hbox)
 
 
@@ -320,7 +320,7 @@ class Dialog_set_something( QDialog ):
         search = True
         list_options = None
         if option == 'set_profile':
-            list_options = get_profiles()
+            list_options = abc_list( get_profiles() )
         elif option == 'mods_files':
             list_options = not_repeat_item(
                 abc_list( get_mods_files() )
