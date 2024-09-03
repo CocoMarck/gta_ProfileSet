@@ -149,9 +149,7 @@ def menu_set_something( profile=None, option='set_profile', set_mode='normal' ):
             abc_list( get_mods_files() )
         )
     elif option == 'mods_dirs':
-        list_options = not_repeat_item(
-            abc_list( get_mods_dirs() )
-        )
+        list_options = abc_list( get_mods_dirs() )
 
     elif (
         option == 'Priority' or
@@ -289,7 +287,7 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
         parameter == 'ExclusiveMods'
     ):
         change_options = ['add', 'remove', 'custom']
-        list_options = get_profile_parameter_listMods( profile=profile, parameter=parameter )
+        list_options = abc_list( get_profile_parameter_listMods( profile=profile, parameter=parameter ) )
         if parameter == 'Priority':
             change_options.append('cfg_priority')
 
@@ -434,7 +432,9 @@ def menu_config_parameter(profile=None, parameter=None, set_mode='normal'):
             if not change_options == []:
                 # Actualizar opciones
                 text_options = ''
-                list_options = get_profile_parameter_listMods( profile=profile, parameter=parameter )
+                list_options = abc_list(
+                    get_profile_parameter_listMods( profile=profile, parameter=parameter )
+                )
                 for item in list_options:
                     text_options += f'{item}\n'
 
