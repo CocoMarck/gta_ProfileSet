@@ -1,5 +1,5 @@
 import argparse
-from Modulos.gta_modloader_function import *
+from data.gta_modloader_function import *
 
 
 # Objeto para los parametros

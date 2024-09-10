@@ -1,119 +1,42 @@
-from Modulos.gta_modloader_function import *
-from Modulos.Modulo_Language import get_text
+from data.gta_modloader_function import *
+from data.Modulo_Language import get_text
+
+from interface.interface_info import *
+from interface.Qt.qss_util import *
+
 import sys, os
 from functools import partial
+
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 
 
-# Establecer dimenciones de windegts y ventana
-# Limite de resolucion: Anchura y altura de 480px como minimo.
-display = get_display_resolution()
-
-def get_display_number(multipler=0, divisor=0, based='width'):
-    if based == 'width':
-        base = display[0]
-    else:
-        base = display[1]
-
-    lim_max = int( max(display)*0.75 )
-    lim_min = 8
-
-    number = None
-    if multipler > 0:
-        number = base*multipler
-    else:
-        if divisor > 0:
-            number = base/divisor
-
-    if not number == None:
-        if number > lim_max:
-            return lim_max
-        elif number < lim_min:
-            return lim_min
-        else:
-            return int(number)
-
-
-num_font = get_display_number(divisor=120)
-num_space_padding = int(num_font/3)
-nums_space_margin = [
-    int(num_font/2),
-    int(num_font/4)
-]
-
-nums_win_main = [
-    get_display_number(multipler=0.3, based='width'),
-    get_display_number(multipler=0.3, based='height')
-]
-nums_win_set_something = [
-    get_display_number(multipler=0.25, based='width'),
-    get_display_number(multipler=0.35, based='height')
-]
-nums_win_cfg_param = [
-    get_display_number(multipler=0.25, based='width'),
-    get_display_number(multipler=0.25, based='height')
-]
-
-'''
-print(display)
-print(num_font)
-print(num_space_padding)
-print(nums_space_margin)
-print(nums_win_main)
-print(nums_win_set_something)
-print(nums_win_cfg_param)
-'''
-
 
 
 # Estilo de programa
+margin = num_font
 style = (
-    'QLabel {\n'
-    f'font-size: {num_font}px;\n'
+    text_widget_style(
+        widget='QLabel',
+        font=font, font_size=num_font, margin=margin, padding=None, idented=4
+    ) +
 
-    f'margin-left: {nums_space_margin[0]}px;\n'
-    f'margin-right: {nums_space_margin[0]}px;\n'
-    f'margin-top: {nums_space_margin[1]}px;\n'
-    f'margin-bottom: {nums_space_margin[1]}px;\n'
-    '}\n'
+    text_widget_style(
+        widget='QPushButton',
+        font=font, font_size=num_font, margin=margin, padding=num_space_padding, idented=4
+    ) +
 
-    'QPushButton {\n'
-    f'font-size: {num_font}px;\n'
-    #f'margin: {nums_space_margin[0]}px;\n' # Espacio entre widgets
-    f'margin-left: {nums_space_margin[0]}px;\n'
-    f'margin-right: {nums_space_margin[0]}px;\n'
-    f'margin-top: {nums_space_margin[1]}px;\n'
-    f'margin-bottom: {nums_space_margin[1]}px;\n'
-
-    f'padding: {num_space_padding}px;\n' # Size adicional para el widget
-
-    #'border-radius: 8px;\n'
-    #'border: 1px solid;\n'
-    '}\n'
-
-
-    'QLineEdit {\n'
-    f'font-size: {num_font}px;\n'
-
-    f'margin-left: {nums_space_margin[0]}px;\n'
-    f'margin-right: {nums_space_margin[0]}px;\n'
-    f'margin-top: {nums_space_margin[1]}px;\n'
-    f'margin-bottom: {nums_space_margin[1]}px;\n'
-
-    f'padding: {num_space_padding}px;\n' # Size adicional para el widget
-    '}\n'
+    text_widget_style(
+        widget='QLineEdit',
+        font=font, font_size=num_font, margin=margin, padding=num_space_padding, idented=4
+    )
 )
-
+#print(style)
 
 
 
 # Programa....
-icon_gta_ProfileSet = os.path.join(dir_main, 'gta_ProfileSet.ico')
-
-
-
 class Window_Main(QWidget):
     '''
     Ventana main:
@@ -705,6 +628,7 @@ class Dialog_config_parameter(QDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    #app.setStyle( 'fusion' )
     app.setStyleSheet( style )
     app.setWindowIcon( QIcon(icon_gta_ProfileSet) ) # Establecer icono a todo
     test = test_to_pass()

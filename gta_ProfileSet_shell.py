@@ -1,10 +1,11 @@
-from Modulos.Modulo_System import *
-from Modulos.Modulo_Language import *
-from Modulos.Modulo_ShowPrint import *
+from data.Modulo_Language import *
+from data.gta_modloader_function import *
+
+from logic.Modulo_System import *
+
+from interface.Modulo_ShowPrint import *
 from pathlib import Path as pathlib
 import os, subprocess
-
-from Modulos.gta_modloader_function import *
 
 
 
