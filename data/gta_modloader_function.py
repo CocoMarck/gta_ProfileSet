@@ -23,7 +23,13 @@ def execute_game():
     Ejecutar juego
     '''
     if os.path.isfile(exe_gta_sa):
-        subprocess.Popen(exe_gta_sa)
+        print(f"Execute {exe_gta_sa}...")
+        if get_system() == 'win':           command = f'start "" "{exe_gta_sa}"'
+        else:                               command = f'wine "{exe_gta_sa}"'
+        subprocess.Popen(command, shell=True)
+        # Es posible que no sea necesaro (shell=True)
+    else:
+        print(f'The file "{exe_gta_sa}" not exists')
 
 
 
