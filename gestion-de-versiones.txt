@@ -1,0 +1,15 @@
+Versiones en tres numeros.
+Primer numero indica una versión mayor, la version principal. 1.0.0
+Segudo numero indica una versión menor, nos indica nuevas funcionalidades. 1.2.0
+El tercero se le conoce como revición, nos indica que se arreglo errores de codigo. 1.2.4
+
+
+versiones por estabilidad:
+Las opciones son: Alpha, Beta, Stable
+
+Alpha es una versión inestable que es muy probable que tenga muchas opciones que mejorar, pero queremos que sea probada para encontrar errres y poder poner a prueba funcionalidades, en la mayoría de casas podemos decir que esta casi listo el proyecto.
+Ejemplo 1.0Alpha, 1.0a1, 1.0a2
+
+Beta una versión mas estable que alpha en la que contamos con el producto en su totalidad y se desea realizar pruebas de rendimiento, usabilidad y funcionamiento de algunos módulos para ver cómo funciona bajo un ambiento no tan controlado.
+Ejemplo: 2.0Beta, 2.0b, 2.0b, 2.0b1
+
