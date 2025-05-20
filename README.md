@@ -2,7 +2,7 @@
 Un launcher que te permite cambiar el perfil de modlader en gta sa
 
 ### Dependencias para compilación
-[Archivo con todas las dependencias necesarias] (dependencies.txt)
+* [Archivo con todas las dependencias necesarias] (dependencies.txt)
 
 ### Como compilar
 - Cliente para consola
