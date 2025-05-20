@@ -1,5 +1,6 @@
 # gtaProfileSet
-Un launcher que te permite cambiar el perfil de modlader en gta sa
+Un launcher que te permite cambiar parametros del modloader.ini
+Esta aplicación permite la gestión de mods de manera mas visual y rapida.
 
 ### Dependencias para compilación
 [Archivo con todas las dependencias necesarias] (dependencies.txt)
