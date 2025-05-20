@@ -32,7 +32,7 @@ style = (
         font=font, font_size=num_font, margin=margin, padding=num_space_padding, idented=4
     )
 )
-#print(style)
+print(style)
 
 
 
@@ -456,6 +456,7 @@ class Dialog_config_parameter(QDialog):
             self.__dict_config_label = {}
             dict_config = get_profile_parameter_Config( profile=profile )
             for option in ['ExcludeAllMods', 'IgnoreAllMods', 'Parents']:
+                # Opcion
                 hbox = QHBoxLayout()
                 vbox_main.addLayout(hbox)
 
@@ -469,10 +470,30 @@ class Dialog_config_parameter(QDialog):
                     button.clicked.connect( partial(self.change_config, option=option) )
                 hbox.addWidget( button )
                 hbox.addStretch()
+            
+                # Scroll
+                scroll_area = QScrollArea()
+                scroll_area.setVerticalScrollBarPolicy(
+                    Qt.ScrollBarPolicy.ScrollBarAsNeeded,
+                )
+                scroll_area.setWidgetResizable(True) # Para centrer el scroll
+                vbox_main.addWidget(scroll_area)
+                
+                # Scroll - Contenedor de botones
+                widget_container = QWidget()
+                widget_vbox_main = QVBoxLayout()
+                widget_container.setLayout(widget_vbox_main)
 
+                # Scroll - Agergar labels
                 label = QLabel( str(dict_config[option]) )
-                hbox.addWidget( label )
+                label.setTextInteractionFlags( Qt.TextInteractionFlag.TextSelectableByMouse )
+                widget_vbox_main.addWidget(label)
+                #hbox.addWidget( label )
+                
+                # Scroll
+                scroll_area.setWidget(widget_container)
 
+                # Agregar al dicionario
                 self.__dict_config_label.update( {option:label} )
 
         # Seccion Vertical botones de agregar y remover, o cancelar.
@@ -533,7 +554,8 @@ class Dialog_config_parameter(QDialog):
                 parents, ok = QInputDialog.getText(
                     self,
                     get_text(option),
-                    f"{get_text('text')}:"
+                    f"{get_text('text')}:",
+                    text=self.__dict_config_label[option].text() # valor default
                 )
                 if ok and parents:
                     # Establecer padres de perfil, solo si se preciona ok y hay texto
