@@ -137,7 +137,7 @@ def set_profile(profile=None, ini_text=None):
     Establece en el archivo "modloader.ini", el perfil "Profile=El_asignado"
     '''
     good_change = False
-    ini_text = get_modloader_text(mode_list=True)
+    ini_text = get_text_modloader_text(mode_list=True)
     if not ini_text == None:
         text_ready = ''
         for line in text_ini:
