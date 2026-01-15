@@ -24,3 +24,7 @@ print( modloader_controller.get_profiles() )
 modloader_repository.write_profile( 'Esta es mi primera chamba', formatted=True )
 modloader_controller.get_current_profile()
 print( modloader_model.profile )
+
+print( modloader_repository.get_profile_section_line_numbers( 'Default' ) )
+
+print( modloader_repository.get_profile_values_section( 'Default', 'IgnoreMods' ) )

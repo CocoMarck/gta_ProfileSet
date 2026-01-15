@@ -12,10 +12,11 @@ DOMAIN_PROFILES = 'Profiles'
 SECTION_CONFIG = 'Config'
 SECTION_PRIORITY = 'Priority'
 SECTION_IGNORE_FILES = 'IgnoreFiles'
+SECTION_IGNORE_MODS = 'IgnoreMods'
 SECTION_INCLUDE_MODS = 'IncludeMods'
 SECTION_EXCLUSIVE_MODS = 'ExclusiveMods'
 PROFILE_SECTIONS = (
-    SECTION_CONFIG, SECTION_PRIORITY, SECTION_IGNORE_FILES,
+    SECTION_CONFIG, SECTION_PRIORITY, SECTION_IGNORE_FILES, SECTION_IGNORE_MODS,
     SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS
 )
 
@@ -139,6 +140,11 @@ class GTASAModloaderRepository:
         return self.text_in_kebab_format( text=profile )
 
 
+    def write_text_lines( self, lines ):
+        with open(self.modloader_file, 'w', encoding=ENCODING) as text:
+            text.writelines( lines )
+
+
     def write_profile(self, profile, formatted=False):
         '''
         Establecer profile. `Profile=profile`. Indicar si sera formateado o no.
@@ -191,3 +197,67 @@ class GTASAModloaderRepository:
             line_number += 1
 
         return dict_section_line_numbers
+
+
+    def get_profile_values_section(self, profile, section):
+        '''
+        Diccionario, que establece donde poner los valores, con este diccinoario se puede construir el `modloader.ini`, con los cambios necesarios.
+        '''
+        # Obtener datos
+        text_lines = self.get_text_lines()
+        dict_section_line_numbers = self.get_profile_section_line_numbers( profile=profile )
+
+        # Primeras lineas, antes de escritura de valores
+        dict_values_section = {
+            'first_lines': [], 'line_values': [], 'last_lines': []
+        }
+        line_number = 0
+        for line in text_lines:
+            if line_number < dict_section_line_numbers[section]+1:
+                dict_values_section['first_lines'].append( line )
+                line_number += 1
+
+        # Determinar lineas de escritura de valores
+        line_number = 0
+        final_line_number = None
+        for line in text_lines:
+            if line_number > dict_section_line_numbers[section]:
+                if line.startswith( '[Profiles.' ) and final_line_number == None:
+                    final_line_number = line_number
+                    break
+                if line.replace(' ', '') != '':
+                    dict_values_section['line_values'].append( line )
+            line_number += 1
+
+        # Despues de lineas de valores, las lineas finales
+        line_number = 0
+        for line in text_lines:
+            if line_number >= final_line_number:
+                dict_values_section['last_lines'].append( line )
+            line_number += 1
+
+        # Retornar linea de valores a remplazar
+        return dict_values_section
+
+
+    def insert_dict_values_section(self, dict_values_section, value):
+        '''
+        Insertar valor en sección especifica, en dicionario a construir como texto.
+        '''
+        dict_values_section['line_values'].append( value )
+
+        return dict_values_section
+
+    def update_dict_values_section(self, dict_values_section, parameter_name, value):
+        '''
+        Actualizar parametro en sección especifica, en dicionario a construir como texto.
+        '''
+        index = 0
+        for x in dict_values_section['line_values']:
+            if x.startswith(parameter_name):
+                dict_values_section['line_values'][index] = f'{parameter_name}={value}'
+            index += 1
+
+        return dict_values_section
+
+
