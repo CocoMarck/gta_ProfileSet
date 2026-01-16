@@ -27,4 +27,9 @@ print( modloader_model.profile )
 
 print( modloader_repository.get_profile_section_line_numbers( 'Default' ) )
 
-print( modloader_repository.get_profile_values_section( 'Default', 'IgnoreMods' ) )
+modloader_repository.get_profile_values_section( 'Default', 'IgnoreMods' )
+
+#modloader_repository.insert_profile_priority_value( 'Default', '_essentials')
+modloader_repository.save_profile_priority_value( 'Default', '_essentials', 100)
+modloader_repository.save_profile_priority_value( 'Default', 'proper-fixes', 20)
+print( modloader_repository.get_profile_prioritys( 'Default' ) )

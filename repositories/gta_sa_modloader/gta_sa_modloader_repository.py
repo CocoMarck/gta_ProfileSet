@@ -3,6 +3,7 @@ import pathlib
 
 
 # Constantes
+DEFAULT_PRIORITY = 50
 MAX_PRIORITY = 100
 
 ## Relación a los dominios y secciones del `modloader.ini`.
@@ -19,6 +20,18 @@ PROFILE_SECTIONS = (
     SECTION_CONFIG, SECTION_PRIORITY, SECTION_IGNORE_FILES, SECTION_IGNORE_MODS,
     SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS
 )
+
+IGNORE_ALL_MODS_PARAMETER = "IgnoreAllMods"
+EXCLUDE_ALL_MODS_PARAMETER = "ExcludeAllMods"
+PARENTS_PARAMETER = "Parents"
+
+PROFILE_CONFIG_PARAMETERS = [
+    IGNORE_ALL_MODS_PARAMETER,
+    EXCLUDE_ALL_MODS_PARAMETER,
+    PARENTS_PARAMETER
+]
+
+PROFILE_PARAMETER = "Profile"
 
 ## Relacionado con los archivos y el archivo de configuración
 GTA_SA_FILENAME = 'gta_sa.exe'
@@ -142,7 +155,7 @@ class GTASAModloaderRepository:
 
     def write_text_lines( self, lines ):
         with open(self.modloader_file, 'w', encoding=ENCODING) as text:
-            text.writelines( lines )
+            text.write( '\n'.join(lines) )
 
 
     def write_profile(self, profile, formatted=False):
@@ -245,8 +258,7 @@ class GTASAModloaderRepository:
         Insertar valor en sección especifica, en dicionario a construir como texto.
         '''
         dict_values_section['line_values'].append( value )
-
-        return dict_values_section
+        return True
 
     def update_dict_values_section(self, dict_values_section, parameter_name, value):
         '''
@@ -256,8 +268,137 @@ class GTASAModloaderRepository:
         for x in dict_values_section['line_values']:
             if x.startswith(parameter_name):
                 dict_values_section['line_values'][index] = f'{parameter_name}={value}'
+                return True
             index += 1
+        return False
 
-        return dict_values_section
+    def build_text_lines_dict_values_section(self, dict_values_section):
+        '''
+        Construir lineas de diccionario
+        '''
+        final_text_lines = []
+        final_text_lines.extend( dict_values_section['first_lines'] )
+        final_text_lines.extend( dict_values_section['line_values'] )
+        final_text_lines.append( '' )
+        final_text_lines.extend( dict_values_section['last_lines'] )
+
+        return final_text_lines
+
+
+    def update_profile_config_value(self, profile: str, parameter_name: str, value: bool):
+        '''
+        Actualizar parametro de configuración de perfil
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_CONFIG
+        )
+        update = False
+        if parameter_name in PROFILE_CONFIG_PARAMETERS and isinstance(value, bool):
+            update = self.update_dict_values_section(
+                dict_values_section, parameter_name=parameter_name, value=str(value).lower()
+            )
+
+        if update:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+
+        return update
+
+
+    def filter_priority_value(self, value: int):
+        if value > MAX_PRIORITY:
+            value = MAX_PRIORITY
+        elif value < 0:
+            value = 0
+        return value
+
+
+    def insert_profile_priority_value(
+            self, profile: str, parameter_name: str, value: int = DEFAULT_PRIORITY
+        ):
+        '''
+        Insertar parametro de pioridad de mod en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_PRIORITY
+        )
+        insert = self.insert_dict_values_section(
+            dict_values_section,
+            value=f'{parameter_name}={self.filter_priority_value(value=value)}'
+        )
+
+        if insert:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+
+        return insert
+
+    def update_profile_priority_value(
+            self, profile: str, parameter_name: str, value: int
+        ):
+        '''
+        Actualizar parametro de pioridad de mod en un perfil
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_PRIORITY
+        )
+        update = self.update_dict_values_section(
+            dict_values_section, parameter_name=parameter_name,
+            value=self.filter_priority_value(value)
+        )
+
+        if update:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+
+        return update
+
+
+    def exists_in_dict_values_section( self, dict_values_section, parameter_name ):
+        '''
+        Detectar si existe parametro en la sección del perfil.
+        '''
+        exists = False
+        for x in dict_values_section['line_values']:
+            if x.startswith( parameter_name ):
+                exists = True
+                break
+        return exists
+
+
+    def save_profile_priority_value(
+            self, profile: str, parameter_name: str, value:int = DEFAULT_PRIORITY
+        ):
+        '''
+        Guardar o insertar parametro de pioridad de mod.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_PRIORITY
+        )
+        exists = self.exists_in_dict_values_section(
+            dict_values_section, parameter_name=parameter_name
+        )
+        if exists:
+            return self.update_profile_priority_value(
+                profile=profile, parameter_name=parameter_name, value=value
+            )
+        else:
+            return self.insert_profile_priority_value(
+                profile=profile, parameter_name=parameter_name, value=value
+            )
+
+
+    def get_profile_prioritys(self, profile: str):
+        '''
+        Obtener pioridades
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_PRIORITY
+        )
+        return dict_values_section['line_values']
+
 
 
