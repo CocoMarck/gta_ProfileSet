@@ -241,13 +241,17 @@ class GTASAModloaderRepository:
                 if line.replace(' ', '') != '':
                     dict_values_section['line_values'].append( line )
             line_number += 1
+        the_section_is_the_final_line = line_number-1 == dict_section_line_numbers[section]
 
         # Despues de lineas de valores, las lineas finales
-        line_number = 0
-        for line in text_lines:
-            if line_number >= final_line_number:
-                dict_values_section['last_lines'].append( line )
-            line_number += 1
+        if the_section_is_the_final_line:
+             dict_values_section['last_lines'].append( '' )
+        else:
+            line_number = 0
+            for line in text_lines:
+                if line_number >= final_line_number:
+                    dict_values_section['last_lines'].append( line )
+                line_number += 1
 
         # Retornar linea de valores a remplazar
         return dict_values_section
@@ -285,6 +289,7 @@ class GTASAModloaderRepository:
         return final_text_lines
 
 
+    # Config
     def update_profile_config_value(self, profile: str, parameter_name: str, value: bool):
         '''
         Actualizar parametro de configuración de perfil
@@ -313,7 +318,7 @@ class GTASAModloaderRepository:
             value = 0
         return value
 
-
+    # Priority
     def insert_profile_priority_value(
             self, profile: str, parameter_name: str, value: int = DEFAULT_PRIORITY
         ):
@@ -368,7 +373,6 @@ class GTASAModloaderRepository:
                 break
         return exists
 
-
     def save_profile_priority_value(
             self, profile: str, parameter_name: str, value:int = DEFAULT_PRIORITY
         ):
@@ -390,8 +394,7 @@ class GTASAModloaderRepository:
                 profile=profile, parameter_name=parameter_name, value=value
             )
 
-
-    def get_profile_prioritys(self, profile: str):
+    def get_profile_priorities(self, profile: str):
         '''
         Obtener pioridades
         '''
@@ -401,4 +404,78 @@ class GTASAModloaderRepository:
         return dict_values_section['line_values']
 
 
+    # IgnoreFiles
+    def insert_profile_ignore_file_value( self, profile: str, value: str ):
+        '''
+        Insertar mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_FILES
+        )
+        insert = self.insert_dict_values_section( dict_values_section, value=value )
+        if insert:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+        return insert
+
+    def save_profile_ignore_file_value( self, profile: str, value:str ):
+        '''
+        Guardar mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_FILES
+        )
+        exists = self.exists_in_dict_values_section( dict_values_section, parameter_name=value )
+        if not exists:
+            return self.insert_profile_ignore_file_value( profile=profile, value=value )
+        else:
+            return False
+
+    def get_profile_ignore_files(self, profile: str):
+        '''
+        Obtener archivos de mods a ignorar
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_FILES
+        )
+        return dict_values_section['line_values']
+
+
+    # IgnoreMods
+    def insert_profile_ignore_mod_value( self, profile: str, value: str ):
+        '''
+        Insertar directiorio de mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_MODS
+        )
+        insert = self.insert_dict_values_section( dict_values_section, value=value )
+        if insert:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+        return insert
+
+    def save_profile_ignore_mod_value( self, profile: str, value:str ):
+        '''
+        Guardar directiorio de mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_MODS
+        )
+        exists = self.exists_in_dict_values_section( dict_values_section, parameter_name=value )
+        if not exists:
+            return self.insert_profile_ignore_mod_value( profile=profile, value=value )
+        else:
+            return False
+
+    def get_profile_ignore_mods(self, profile: str):
+        '''
+        Obtener archivos de mods a ignorar
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_MODS
+        )
+        return dict_values_section['line_values']
 

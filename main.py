@@ -32,4 +32,11 @@ modloader_repository.get_profile_values_section( 'Default', 'IgnoreMods' )
 #modloader_repository.insert_profile_priority_value( 'Default', '_essentials')
 modloader_repository.save_profile_priority_value( 'Default', '_essentials', 100)
 modloader_repository.save_profile_priority_value( 'Default', 'proper-fixes', 20)
-print( modloader_repository.get_profile_prioritys( 'Default' ) )
+print( modloader_repository.get_profile_priorities( 'Default' ) )
+
+modloader_repository.save_profile_ignore_file_value( 'Default', 'imfx.asi' )
+modloader_repository.save_profile_ignore_file_value( 'Default', 'shell.asi' )
+print( modloader_repository.get_profile_ignore_files( 'Default' ) )
+
+dict_lines = modloader_repository.get_profile_values_section( 'Default', 'ExclusiveMods' )
+print( dict_lines )
