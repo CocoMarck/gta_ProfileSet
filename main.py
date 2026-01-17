@@ -1,6 +1,8 @@
-from models.gta_sa_modloader import GTASAModloaderModel
-from repositories.gta_sa_modloader import GTASAModloaderRepository
-from controllers.gta_sa_modloader import GTASAModloaderController
+from models.gta_sa_modloader import ProfileModel, FolderModel
+from repositories.gta_sa_modloader.path_repository import PathRepository
+from repositories.gta_sa_modloader.text_repository import TextRepository
+from repositories.gta_sa_modloader.folder_repository import FolderRepository
+from repositories.gta_sa_modloader.profile_repository import ProfileRepository
 
 # Paths
 from utils.resource_loader import ResourceLoader
@@ -9,34 +11,31 @@ resource_loader = ResourceLoader()
 
 
 
-# Modloader
-modloader_model = GTASAModloaderModel()
-modloader_repository = GTASAModloaderRepository( resource_loader.base_dir )
-modloader_controller = GTASAModloaderController( modloader_model, modloader_repository )
+# Models
+profile_model = ProfileModel()
+folder_model = FolderModel()
 
-print( modloader_repository.get_text_lines() )
+# Repository
+path_repository = PathRepository( resource_loader.base_dir )
+print(
+    path_repository.get_files(),
+    path_repository.get_mods()
+)
 
-modloader_controller.get_current_profile()
-print( modloader_model.profile )
+text_repository = TextRepository( path_repository.modloader_file )
+print(
+    text_repository.get_lines(),
+    text_repository.in_kebab_format( 'Hola como estas' )
+)
 
-print( modloader_controller.get_profiles() )
+folder_repository = FolderRepository( text_repository )
+print(
+    folder_repository.write_profile( 'Default' ),
+    folder_repository.get_profile()
+)
 
-modloader_repository.write_profile( 'Esta es mi primera chamba', formatted=True )
-modloader_controller.get_current_profile()
-print( modloader_model.profile )
-
-print( modloader_repository.get_profile_section_line_numbers( 'Default' ) )
-
-modloader_repository.get_profile_values_section( 'Default', 'IgnoreMods' )
-
-#modloader_repository.insert_profile_priority_value( 'Default', '_essentials')
-modloader_repository.save_profile_priority_value( 'Default', '_essentials', 100)
-modloader_repository.save_profile_priority_value( 'Default', 'proper-fixes', 20)
-print( modloader_repository.get_profile_priorities( 'Default' ) )
-
-modloader_repository.save_profile_ignore_file_value( 'Default', 'imfx.asi' )
-modloader_repository.save_profile_ignore_file_value( 'Default', 'shell.asi' )
-print( modloader_repository.get_profile_ignore_files( 'Default' ) )
-
-dict_lines = modloader_repository.get_profile_values_section( 'Default', 'ExclusiveMods' )
-print( dict_lines )
+profile_repository = ProfileRepository( text_repository )
+print(
+    profile_repository.update_config( 'Default', 'ExcludeAllMods', True ),
+    profile_repository.get_dict_values_section( 'Default', 'Config' )['line_values']
+)

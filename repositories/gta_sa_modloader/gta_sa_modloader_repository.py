@@ -244,9 +244,7 @@ class GTASAModloaderRepository:
         the_section_is_the_final_line = line_number-1 == dict_section_line_numbers[section]
 
         # Despues de lineas de valores, las lineas finales
-        if the_section_is_the_final_line:
-             dict_values_section['last_lines'].append( '' )
-        else:
+        if not the_section_is_the_final_line:
             line_number = 0
             for line in text_lines:
                 if line_number >= final_line_number:
@@ -476,6 +474,122 @@ class GTASAModloaderRepository:
         '''
         dict_values_section = self.get_profile_values_section(
             profile=profile, section=SECTION_IGNORE_MODS
+        )
+        return dict_values_section['line_values']
+
+
+
+
+    # IgnoreFiles
+    def insert_profile_ignore_file_value( self, profile: str, value: str ):
+        '''
+        Insertar mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_FILES
+        )
+        insert = self.insert_dict_values_section( dict_values_section, value=value )
+        if insert:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+        return insert
+
+    def save_profile_ignore_file_value( self, profile: str, value:str ):
+        '''
+        Guardar mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_FILES
+        )
+        exists = self.exists_in_dict_values_section( dict_values_section, parameter_name=value )
+        if not exists:
+            return self.insert_profile_ignore_file_value( profile=profile, value=value )
+        else:
+            return False
+
+    def get_profile_ignore_files(self, profile: str):
+        '''
+        Obtener archivos de mods a ignorar
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_IGNORE_FILES
+        )
+        return dict_values_section['line_values']
+
+
+    # IncludeMods
+    def insert_profile_include_mod_value( self, profile: str, value: str ):
+        '''
+        Insertar directiorio de mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_INCLUDE_MODS
+        )
+        insert = self.insert_dict_values_section( dict_values_section, value=value )
+        if insert:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+        return insert
+
+    def save_profile_include_mod_value( self, profile: str, value:str ):
+        '''
+        Guardar directiorio de mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_INCLUDE_MODS
+        )
+        exists = self.exists_in_dict_values_section( dict_values_section, parameter_name=value )
+        if not exists:
+            return self.insert_profile_include_mod_value( profile=profile, value=value )
+        else:
+            return False
+
+    def get_profile_include_mods(self, profile: str):
+        '''
+        Obtener archivos de mods a ignorar
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_INCLUDE_MODS
+        )
+        return dict_values_section['line_values']
+
+
+    # ExclusiveMods
+    def insert_profile_exclusive_mod_value( self, profile: str, value: str ):
+        '''
+        Insertar directiorio de mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_EXCLUSIVE_MODS
+        )
+        insert = self.insert_dict_values_section( dict_values_section, value=value )
+        if insert:
+            self.write_text_lines(
+                self.build_text_lines_dict_values_section( dict_values_section )
+            )
+        return insert
+
+    def save_profile_exclusive_mod_value( self, profile: str, value:str ):
+        '''
+        Guardar directiorio de mod a ignorar en perfil.
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_INCLUDE_MODS
+        )
+        exists = self.exists_in_dict_values_section( dict_values_section, parameter_name=value )
+        if not exists:
+            return self.insert_profile_exclusive_mod_value( profile=profile, value=value )
+        else:
+            return False
+
+    def get_profile_exclusive_mods(self, profile: str):
+        '''
+        Obtener archivos de mods a ignorar
+        '''
+        dict_values_section = self.get_profile_values_section(
+            profile=profile, section=SECTION_EXCLUSIVE_MODS
         )
         return dict_values_section['line_values']
 
