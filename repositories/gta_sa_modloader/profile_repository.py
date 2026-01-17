@@ -99,6 +99,7 @@ class ProfileRepository():
         line_number = 0
         final_line_number = None
         for line in text_lines:
+            line = ignore_comment( line, ';')
             if line_number > dict_section_line_numbers[section]:
                 if self.is_profile_section( line ) and final_line_number == None:
                     final_line_number = line_number
@@ -109,7 +110,7 @@ class ProfileRepository():
         the_section_is_the_final_line = line_number-1 == dict_section_line_numbers[section]
 
         # Despues de lineas de valores, las lineas finales
-        if not the_section_is_the_final_line:
+        if not the_section_is_the_final_line and isinstance(final_line_number, int):
             line_number = 0
             for line in text_lines:
                 if line_number >= final_line_number:
@@ -161,9 +162,9 @@ class ProfileRepository():
             profile=profile, section=SECTION_CONFIG
         )
         update = False
-        if parameter_name in PROFILE_CONFIG_PARAMETERS and isinstance(value, bool):
+        if parameter_name in PROFILE_CONFIG_PARAMETERS:
             update = self.update_dict_values_section(
-                dict_values_section, parameter_name=parameter_name, value=str(value).lower()
+                dict_values_section, parameter_name=parameter_name, value=value
             )
 
         if update:
@@ -173,6 +174,71 @@ class ProfileRepository():
 
         return update
 
+    def update_exclude_all_mods(self, profile: str, value: bool):
+        update = False
+        if isinstance(value, bool):
+            update = self.update_config( profile, EXCLUDE_ALL_MODS_PARAMETER, str(value).lower() )
+        return update
+
+    def update_ignore_all_mods(self, profile: str, value: bool):
+        update = False
+        if isinstance(value, bool):
+            update = self.update_config( profile, IGNORE_ALL_MODS_PARAMETER, str(value).lower() )
+        return update
+
+    def get_parents(self, profile: str):
+        parents_value = ''
+        for line in self.get_dict_values_section( profile, SECTION_CONFIG )['line_values']:
+            if self.text_repository.detect_line_as_parameter( line, PARENTS_PARAMETER ):
+                parents_value = line.split( '=' )[1]
+                break
+        return self.text_repository.str_to_list( parents_value )
+
+    def write_parents(self, profile: str, values: list):
+        '''
+        Escribir padres herdados, solo insertar cuando no exista. Texto normalizado, para forzar coincidencias, y evitar bugs.
+        '''
+        write = False
+        if isinstance(values, list):
+            new_parents = []
+            parents = self.get_parents( profile )
+            for new_parent in values:
+                if not ( self.text_repository.normalize_text(new_parent) in parents):
+                    new_parents.append( new_parent )
+            if new_parents != []:
+                parents.extend(new_parents)
+                count = 0
+                for parent in parents:
+                    if parent == '$None':
+                        parents.pop( count )
+                    count += 1
+                write = self.update_config(
+                    profile, PARENTS_PARAMETER, self.text_repository.list_to_str( parents )
+                )
+        return write
+
+    def remove_parents(self, profile: str, values: list):
+        '''
+        Elimitar todos los padres heredados.
+        '''
+        remove = False
+        if isinstance(values, list):
+            parents = self.get_parents( profile )
+            count = 0
+            for parent in parents:
+                if parent in values:
+                    parents.pop( count )
+                    remove = True
+                count += 1
+            if remove:
+                remove = self.update_config(
+                    profile, PARENTS_PARAMETER, self.text_repository.list_to_str( parents )
+                )
+        return remove
+
+    def clear_parents(self, profile):
+        remove = self.update_config( profile, PARENTS_PARAMETER, '$None' )
+        return remove
 
 
     # Priority
@@ -182,6 +248,17 @@ class ProfileRepository():
         elif value < 0:
             value = 0
         return value
+
+    def exists_in_dict_values_section( self, dict_values_section, parameter_name ):
+        '''
+        Detectar si existe parametro en la sección del perfil.
+        '''
+        exists = False
+        for x in dict_values_section['line_values']:
+            if x.startswith( parameter_name ):
+                exists = True
+                break
+        return exists
 
     def insert_priority(
             self, profile: str, parameter_name: str, value: int = DEFAULT_PRIORITY
@@ -204,9 +281,7 @@ class ProfileRepository():
 
         return insert
 
-    def update_priority(
-            self, profile: str, parameter_name: str, value: int
-        ):
+    def update_priority( self, profile: str, parameter_name: str, value: int ):
         '''
         Actualizar parametro de pioridad de mod en un perfil
         '''
@@ -218,8 +293,76 @@ class ProfileRepository():
         )
 
         if update:
-            self.texte_repository.write_lines(
+            self.text_repository.write_lines(
                 self.build_lines_dict_values_section( dict_values_section )
             )
 
         return update
+
+    def save_priority(
+            self, profile: str, parameter_name: str, value:int = DEFAULT_PRIORITY
+        ):
+        '''
+        Guardar o insertar parametro de pioridad de mod.
+        '''
+        dict_values_section = self.get_dict_values_section(
+            profile=profile, section=SECTION_PRIORITY
+        )
+        exists = self.exists_in_dict_values_section(
+            dict_values_section, parameter_name=parameter_name
+        )
+        if exists:
+            return self.update_priority(
+                profile=profile, parameter_name=parameter_name, value=value
+            )
+        else:
+            return self.insert_priority(
+                profile=profile, parameter_name=parameter_name, value=value
+            )
+
+    def get_priorities(self, profile: str):
+        '''
+        Obtener pioridades
+        '''
+        dict_values_section = self.get_dict_values_section( profile, SECTION_PRIORITY )
+        dict_priorities = {}
+        for line in dict_values_section['line_values']:
+            split_line = line.split('=')
+            dict_priorities.update( { split_line[0]: split_line[1] }  )
+        return dict_priorities
+
+    # IgnoreFiles
+    def insert_simple_value(self, profile: str, section: str, value):
+        '''
+        Insertar valor simple a una seccion del perfil.
+        '''
+        dict_values_section = self.get_dict_values_section( profile, section )
+        insert = self.insert_dict_values_section( dict_values_section, value=value )
+        if insert:
+            self.text_repository.write_lines(
+                self.build_lines_dict_values_section( dict_values_section )
+            )
+        return insert
+
+    def save_simple_value( self, profile: str, section: str, value:str ):
+        '''
+        Guardar valor simple a una sección del perfil
+        '''
+        dict_values_section = self.get_dict_values_section( profile, section )
+        exists = self.exists_in_dict_values_section( dict_values_section, value )
+        if not exists:
+            return self.insert_simple_value( profile, section, value )
+        else:
+            return False
+
+    def save_ignore_file( self, profile: str, value: str ):
+        return self.save_simple_value( profile, SECTION_IGNORE_FILES, value )
+
+    def save_ignore_mod( self, profile: str, value: str ):
+        return self.save_simple_value( profile, SECTION_IGNORE_MODS, value )
+
+    def save_include_mod( self, profile: str, value: str ):
+        return self.save_simple_value( profile, SECTION_INCLUDE_MODS, value )
+
+    def save_exclusive_mod( self, profile: str, value: str ):
+        return self.save_simple_value( profile, SECTION_EXCLUSIVE_MODS, value )

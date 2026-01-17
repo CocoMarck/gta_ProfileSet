@@ -36,6 +36,13 @@ print(
 
 profile_repository = ProfileRepository( text_repository )
 print(
-    profile_repository.update_config( 'Default', 'ExcludeAllMods', True ),
-    profile_repository.get_dict_values_section( 'Default', 'Config' )['line_values']
+    profile_repository.get_profiles(),
+    profile_repository.write_parents( 'Default', ['hola', 'adios'] ),
+    profile_repository.get_parents( 'Default' ),
+    profile_repository.save_priority( 'Default', 'cocos' ),
+    profile_repository.get_priorities( 'Default' ),
+    profile_repository.save_ignore_file( 'Default', 'big-headshot.asi' ),
+    profile_repository.save_ignore_mod( 'Default', 'Aiuda chavales' ),
+    profile_repository.save_include_mod( 'Default', 'ModIncluidoPascalCase' ),
+    profile_repository.save_exclusive_mod( 'Default', 'SoloVip' ),
 )

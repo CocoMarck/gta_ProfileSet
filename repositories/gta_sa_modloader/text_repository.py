@@ -36,3 +36,20 @@ class TextRepository:
 
     def format_profile(self, profile):
         return self.text_repository.in_kebab_format( text=profile )
+
+    def list_to_str(self, value: list):
+        text = ''
+        for i in value:
+            text += f'{i}, '
+        if text != '':
+            text = text[:-2]
+        return text
+
+    def str_to_list(self, text: ''):
+        return text.replace(' ', '').split(',')
+
+    def normalize_text(self, text):
+        return text.replace(' ', '').lower()
+
+    def detect_line_as_parameter(self, line, parameter_name):
+        return self.normalize_text( line ).startswith( self.normalize_text(f'{parameter_name}=') )

@@ -71,7 +71,7 @@ class FolderRepository:
         for line in self.text_repository.get_lines():
             # Determinar cambio
             if (
-                line.replace(' ', '').startswith('Profile=') and
+                line.replace(' ', '').startswith(f'{PROFILE_PARAMETER}=') and
                 profile != None
             ):
                 formatted_line = ignore_comment( line, ';' ).replace(' ', '')
