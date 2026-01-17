@@ -42,7 +42,13 @@ print(
     profile_repository.save_priority( 'Default', 'cocos' ),
     profile_repository.get_priorities( 'Default' ),
     profile_repository.save_ignore_file( 'Default', 'big-headshot.asi' ),
+    profile_repository.save_ignore_file( 'Default', 'shell.asi' ),
+    profile_repository.remove_ignore_file( 'Default', 'shell.asi' ),
+    profile_repository.get_ignore_files( 'Default' ),
     profile_repository.save_ignore_mod( 'Default', 'Aiuda chavales' ),
+    profile_repository.get_ignore_mods( 'Default' ),
     profile_repository.save_include_mod( 'Default', 'ModIncluidoPascalCase' ),
+    profile_repository.get_include_mods( 'Default' ),
     profile_repository.save_exclusive_mod( 'Default', 'SoloVip' ),
+     profile_repository.get_exclusive_mods( 'Default' ),
 )

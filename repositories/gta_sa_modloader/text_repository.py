@@ -33,6 +33,8 @@ class TextRepository:
         '''
         return text.lower().replace(' ', '-')
 
+    def dismiss_comment( self, text ):
+        return ignore_comment( text, ';')
 
     def format_profile(self, profile):
         return self.text_repository.in_kebab_format( text=profile )

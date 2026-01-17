@@ -99,7 +99,7 @@ class ProfileRepository():
         line_number = 0
         final_line_number = None
         for line in text_lines:
-            line = ignore_comment( line, ';')
+            line = self.text_repository.dismiss_comment( line )
             if line_number > dict_section_line_numbers[section]:
                 if self.is_profile_section( line ) and final_line_number == None:
                     final_line_number = line_number
@@ -241,6 +241,55 @@ class ProfileRepository():
         return remove
 
 
+    # Obtención de valores simples. Funciones genericas.
+    def insert_simple_value(self, profile: str, section: str, value):
+        '''
+        Insertar valor simple a una seccion del perfil.
+        '''
+        dict_values_section = self.get_dict_values_section( profile, section )
+        insert = self.insert_dict_values_section( dict_values_section, value=value )
+        if insert:
+            self.text_repository.write_lines(
+                self.build_lines_dict_values_section( dict_values_section )
+            )
+        return insert
+
+    def save_simple_value( self, profile: str, section: str, value:str ):
+        '''
+        Guardar valor simple a una sección del perfil
+        '''
+        dict_values_section = self.get_dict_values_section( profile, section )
+        exists = self.exists_in_dict_values_section( dict_values_section, value )
+        if not exists:
+            return self.insert_simple_value( profile, section, value )
+        else:
+            return False
+
+    def get_simple_values(self, profile:str, section:str ):
+        '''
+        Obtener valores simples
+        '''
+        return self.get_dict_values_section( profile, section )['line_values']
+
+    def remove_simple_value(self, profile:str, section:str, value: str):
+        '''
+        Remover un valor simple
+        '''
+        dict_values_section = self.get_dict_values_section( profile, section )
+        remove = False
+        count = 0
+        for line in dict_values_section['line_values']:
+            if line == value:
+                remove = True
+                dict_values_section['line_values'].pop(count)
+            count += 1
+        if remove:
+            self.text_repository.write_lines(
+                self.build_lines_dict_values_section( dict_values_section )
+            )
+        return remove
+
+
     # Priority
     def filter_priority(self, value: int):
         if value > MAX_PRIORITY:
@@ -331,38 +380,34 @@ class ProfileRepository():
             dict_priorities.update( { split_line[0]: split_line[1] }  )
         return dict_priorities
 
-    # IgnoreFiles
-    def insert_simple_value(self, profile: str, section: str, value):
-        '''
-        Insertar valor simple a una seccion del perfil.
-        '''
-        dict_values_section = self.get_dict_values_section( profile, section )
-        insert = self.insert_dict_values_section( dict_values_section, value=value )
-        if insert:
-            self.text_repository.write_lines(
-                self.build_lines_dict_values_section( dict_values_section )
-            )
-        return insert
+    def remove_priority( self, profile: str, value: str ):
+        return self.remove_simple_value( profile, SECTION_PRIORITY, value )
 
-    def save_simple_value( self, profile: str, section: str, value:str ):
-        '''
-        Guardar valor simple a una sección del perfil
-        '''
-        dict_values_section = self.get_dict_values_section( profile, section )
-        exists = self.exists_in_dict_values_section( dict_values_section, value )
-        if not exists:
-            return self.insert_simple_value( profile, section, value )
-        else:
-            return False
 
+    # IgnoreFiles IgnoreMods IncludeMods ExclusiveMods
     def save_ignore_file( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_IGNORE_FILES, value )
+
+    def remove_ignore_file( self, profile: str, value: str ):
+        return self.remove_simple_value( profile, SECTION_IGNORE_FILES, value )
+
+    def get_ignore_files(self, profile:str ):
+        return self.get_simple_values( profile, SECTION_IGNORE_FILES )
 
     def save_ignore_mod( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_IGNORE_MODS, value )
 
+    def get_ignore_mods(self, profile:str ):
+        return self.get_simple_values( profile, SECTION_IGNORE_MODS )
+
     def save_include_mod( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_INCLUDE_MODS, value )
 
+    def get_include_mods(self, profile:str ):
+        return self.get_simple_values( profile, SECTION_INCLUDE_MODS )
+
     def save_exclusive_mod( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_EXCLUSIVE_MODS, value )
+
+    def get_exclusive_mods(self, profile:str ):
+        return self.get_simple_values( profile, SECTION_EXCLUSIVE_MODS )
