@@ -18,8 +18,8 @@ folder_model = FolderModel()
 # Repository
 path_repository = PathRepository( resource_loader.base_dir )
 print(
-    path_repository.get_files(),
-    path_repository.get_mods()
+    path_repository.get_mod_files(),
+    path_repository.get_mod_dirs()
 )
 
 text_repository = TextRepository( path_repository.modloader_file )
