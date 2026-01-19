@@ -38,6 +38,9 @@ class ProfileRepository():
     def is_profile_section( self, line ):
         return line.startswith( f'[{DOMAIN_PROFILES}.' )
 
+    def _normalize_profile(self, profile:str):
+        return self.text_repository.in_kebab_format( text=profile )
+
     def get_profiles(self):
         '''
         Obtener perfiles. Devuelve una lista de los perfiles.
@@ -99,12 +102,12 @@ class ProfileRepository():
 
         # Determinar lineas de escritura de valores
         line_number = 0
-        final_section_line_number = None
+        selected_section_line_number = None
         for line in text_lines:
             line = self.text_repository.dismiss_comment( line )
             if line_number > dict_section_line_numbers[section]:
-                if self.is_profile_section( line ) and final_section_line_number == None:
-                    final_section_line_number = line_number
+                if self.is_profile_section( line ) and selected_section_line_number == None:
+                    selected_section_line_number = line_number
                     break
                 if line.replace(' ', '') != '':
                     dict_values_section['line_values'].append( line )
@@ -112,10 +115,10 @@ class ProfileRepository():
         the_section_is_the_final_line = line_number == len(text_lines)
 
         # Despues de lineas de valores, las lineas finales
-        if not the_section_is_the_final_line and isinstance(final_section_line_number, int):
+        if not the_section_is_the_final_line and isinstance(selected_section_line_number, int):
             line_number = 0
             for line in text_lines:
-                if line_number >= final_section_line_number:
+                if line_number >= selected_section_line_number:
                     dict_values_section['last_lines'].append( line )
                 line_number += 1
 
@@ -435,19 +438,21 @@ class ProfileRepository():
 
     # Profile moment
     def get_new_lines(self, profile: str):
-        formatted_profile = self.text_repository.in_kebab_format( profile )
         new_lines = [
-            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_CONFIG}]',
+            f'[{DOMAIN_PROFILES}.{profile}.{SECTION_CONFIG}]',
+            f'{IGNORE_ALL_MODS_PARAMETER}=false',
+            f'{EXCLUDE_ALL_MODS_PARAMETER}=false',
+            f'{PARENTS_PARAMETER}=$None',
             '',
-            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_PRIORITY}]',
+            f'[{DOMAIN_PROFILES}.{profile}.{SECTION_PRIORITY}]',
             '',
-            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_IGNORE_FILES}]',
+            f'[{DOMAIN_PROFILES}.{profile}.{SECTION_IGNORE_FILES}]',
             '',
-            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_IGNORE_MODS}]',
+            f'[{DOMAIN_PROFILES}.{profile}.{SECTION_IGNORE_MODS}]',
             '',
-            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_INCLUDE_MODS}]',
+            f'[{DOMAIN_PROFILES}.{profile}.{SECTION_INCLUDE_MODS}]',
             '',
-            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_EXCLUSIVE_MODS}]',
+            f'[{DOMAIN_PROFILES}.{profile}.{SECTION_EXCLUSIVE_MODS}]',
             '',
             '',
         ]
@@ -457,17 +462,24 @@ class ProfileRepository():
 
     ## insert profile
     def insert(self, profile: str):
+        '''
+        Insertar perfil
+        '''
+        profile = self._normalize_profile( profile )
         lines = self.get_new_lines( profile )
         self.text_repository.write_lines( lines )
         return True
 
     ## renombrar profile
     def rename(self, profile: str, new_name: str):
+        '''
+        Renombrar pefil
+        '''
         profiles = self.get_profiles()
-        new_name = self.text_repository.in_kebab_format( new_name )
+        new_name = self._normalize_profile( new_name )
         rename = (
             not (new_name in profiles) and
-            new_name != self.text_repository.in_kebab_format(DEFAULT_PROFILE)
+            new_name != self._normalize_profile(DEFAULT_PROFILE)
         )
         if rename:
             profile_line_numbers = self.get_section_line_numbers( profile ).values()
@@ -480,8 +492,7 @@ class ProfileRepository():
     ## remove profile
     def remove(self, profile: str ):
         '''
-        Renombrar pefil.
-        Funciona, pero elimina lineas vacias del perfir anterior/encima. No deberia ser un problema.
+        Remover pefil
         '''
         remove = profile in self.get_profiles()
         if remove:
@@ -499,7 +510,7 @@ class ProfileRepository():
                 if in_range:
                     ignore = True
                 if out_range:
-                    if line.replace(' ', '').startswith(f'[{DOMAIN_PROFILES}.'):
+                    if self.is_profile_section( line.replace(' ', '') ):
                         break
                     else:
                         ignore = True
@@ -515,5 +526,14 @@ class ProfileRepository():
 
             self.text_repository.write_lines(new_lines)
         return remove
+
+    def save(self, profile:str ):
+        profile = self._normalize_profile( profile )
+        exists = profile in self.get_profiles()
+        if not exists:
+            return self.insert( profile )
+        else:
+            return False
+
 
 

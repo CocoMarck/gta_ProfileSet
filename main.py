@@ -65,8 +65,13 @@ print(
     profile_repository.get_exclusive_mods( 'Default' ),
 
     ## Create remove, and rename profile
+    profile_repository.remove( 'coca-cola-espuma' ),
     profile_repository.remove( 'esto-es-la-vida-real' ),
-    profile_repository.insert( 'Esto es la vida Real' ),
+    profile_repository.save( 'Coca cola espuma' ),
+    profile_repository.save( 'esto es la vida real' ),
+    profile_repository.remove( 'coca-cola-espuma' ),
+    profile_repository.rename( 'esto-es-la-vida-real', 'aiuda chavales' ),
+    profile_repository.remove( 'esto-es-la-vida-real' ),
 
-    profile_repository.save_exclusive_mod( 'coca-cola-espuma', 'Saludos' ),
+    #profile_repository.save_exclusive_mod( 'coca-cola-espuma', 'Saludos' ),
 )

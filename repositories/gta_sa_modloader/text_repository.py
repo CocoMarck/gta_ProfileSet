@@ -10,7 +10,7 @@ class TextRepository:
 
     def write_lines( self, lines ):
         with open(self.modloader_file, 'w', encoding=ENCODING) as text:
-            text.write( '\n'.join(lines) )
+            text.write('\n'.join(lines) + '\n')
 
     def get_lines(self):
         '''
@@ -35,9 +35,6 @@ class TextRepository:
 
     def dismiss_comment( self, text ):
         return ignore_comment( text, ';')
-
-    def format_profile(self, profile):
-        return self.text_repository.in_kebab_format( text=profile )
 
     def list_to_str(self, value: list):
         text = ''
