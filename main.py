@@ -3,6 +3,7 @@ from repositories.gta_sa_modloader.path_repository import PathRepository
 from repositories.gta_sa_modloader.text_repository import TextRepository
 from repositories.gta_sa_modloader.folder_repository import FolderRepository
 from repositories.gta_sa_modloader.profile_repository import ProfileRepository
+from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloaderController
 
 # Paths
 from utils.resource_loader import ResourceLoader
@@ -17,61 +18,24 @@ folder_model = FolderModel()
 
 # Repository
 path_repository = PathRepository( resource_loader.base_dir )
+
+# Controller
+modloader_controller = GTASAModloaderController( folder_model, profile_model, path_repository )
+modloader_controller.sync_active_profile()
 print(
-    path_repository.get_mod_files(),
-    path_repository.get_mod_dirs()
+    f'{profile_model.ignore_all_mods}\n'
+    f'{profile_model.exclude_all_mods}\n'
+    f'{profile_model.parents}\n'
+
+    f'{profile_model.priority}\n'
+    f'{profile_model.ignore_files}\n'
+    f'{profile_model.ignore_mods}\n'
+    f'{profile_model.include_mods}\n'
+    f'{profile_model.exclusive_mods}'
 )
+modloader_controller.save_profile( 'comida clasica' )
+modloader_controller.set_folder_profile('Default')
 
-text_repository = TextRepository( path_repository.modloader_file )
-print(
-    text_repository.get_lines(),
-    text_repository.in_kebab_format( 'Hola como estas' )
-)
-
-folder_repository = FolderRepository( text_repository )
-print(
-    folder_repository.write_profile( 'Default' ),
-    folder_repository.get_profile()
-)
-
-profile_repository = ProfileRepository( text_repository )
-print(
-    profile_repository.get_profiles(),
-
-    ## Parents
-    profile_repository.write_parents( 'Default', ['hola', 'adios'] ),
-    profile_repository.get_parents( 'Default' ),
-
-    ## Priority
-    profile_repository.save_priority( 'Default', 'cocos' ),
-    profile_repository.get_priorities( 'Default' ),
-
-    ## IgnoreFiles
-    profile_repository.save_ignore_file( 'Default', 'big-headshot.asi' ),
-    profile_repository.save_ignore_file( 'Default', 'shell.asi' ),
-    profile_repository.remove_ignore_file( 'Default', 'shell.asi' ),
-    profile_repository.get_ignore_files( 'Default' ),
-
-    ## IgnoreMods
-    profile_repository.save_ignore_mod( 'Default', 'Aiuda chavales' ),
-    profile_repository.get_ignore_mods( 'Default' ),
-
-    ## IncludeMods
-    profile_repository.save_include_mod( 'Default', 'ModIncluidoPascalCase' ),
-    profile_repository.get_include_mods( 'Default' ),
-
-    ## ExclusiveMods
-    profile_repository.save_exclusive_mod( 'Default', 'SoloVip' ),
-    profile_repository.get_exclusive_mods( 'Default' ),
-
-    ## Create remove, and rename profile
-    profile_repository.remove( 'coca-cola-espuma' ),
-    profile_repository.remove( 'esto-es-la-vida-real' ),
-    profile_repository.save( 'Coca cola espuma' ),
-    profile_repository.save( 'esto es la vida real' ),
-    profile_repository.remove( 'coca-cola-espuma' ),
-    profile_repository.rename( 'esto-es-la-vida-real', 'aiuda chavales' ),
-    profile_repository.remove( 'esto-es-la-vida-real' ),
-
-    #profile_repository.save_exclusive_mod( 'coca-cola-espuma', 'Saludos' ),
-)
+modloader_controller.select_profile( 'aiuda-chavales' )
+modloader_controller.save_priority( 'wakaneanos-de-las-montañas', 32 )
+print( profile_model.priority )

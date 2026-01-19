@@ -186,11 +186,31 @@ class ProfileRepository():
             update = self.update_config( profile, EXCLUDE_ALL_MODS_PARAMETER, str(value).lower() )
         return update
 
+    def get_exclude_all_mods(self, profile: str):
+        value = False
+        for line in self.get_dict_values_section( profile, SECTION_CONFIG )['line_values']:
+            line = line.replace(' ', '')
+            if self.text_repository.detect_line_as_parameter( line, EXCLUDE_ALL_MODS_PARAMETER ):
+                if line.split( '=' )[1] == 'true':
+                    value = True
+                break
+        return value
+
     def update_ignore_all_mods(self, profile: str, value: bool):
         update = False
         if isinstance(value, bool):
             update = self.update_config( profile, IGNORE_ALL_MODS_PARAMETER, str(value).lower() )
         return update
+
+    def get_ignore_all_mods(self, profile: str):
+        value = False
+        for line in self.get_dict_values_section( profile, SECTION_CONFIG )['line_values']:
+            line = line.replace(' ', '')
+            if self.text_repository.detect_line_as_parameter( line, IGNORE_ALL_MODS_PARAMETER ):
+                if line.split( '=' )[1] == 'true':
+                    value = True
+                break
+        return value
 
     def get_parents(self, profile: str):
         parents_value = ''
@@ -229,16 +249,21 @@ class ProfileRepository():
         '''
         remove = False
         if isinstance(values, list):
+            new_parents = []
+            index_to_ignore = []
             parents = self.get_parents( profile )
             count = 0
             for parent in parents:
                 if parent in values:
-                    parents.pop( count )
+                    index_to_ignore.append(count)
                     remove = True
                 count += 1
+            for index in range( 0, len(parents)):
+                if not (index in index_to_ignore):
+                    new_parents.append( parents[index] )
             if remove:
                 remove = self.update_config(
-                    profile, PARENTS_PARAMETER, self.text_repository.list_to_str( parents )
+                    profile, PARENTS_PARAMETER, self.text_repository.list_to_str( new_parents )
                 )
         return remove
 
@@ -284,11 +309,20 @@ class ProfileRepository():
         dict_values_section = self.get_dict_values_section( profile, section )
         remove = False
         count = 0
+        index_to_ignore = []
+        new_lines = []
         for line in dict_values_section['line_values']:
-            if line == value:
+            if (
+                self.text_repository.normalize_text(line) ==
+                self.text_repository.normalize_text(value)
+            ):
                 remove = True
-                dict_values_section['line_values'].pop(count)
+                index_to_ignore.append(count)
             count += 1
+        for index in range(0, len(dict_values_section['line_values']) ):
+            if not (index in index_to_ignore):
+                new_lines.append( dict_values_section['line_values'][index] )
+        dict_values_section['line_values'] = new_lines
         if remove:
             self.text_repository.write_lines(
                 self.build_lines_dict_values_section( dict_values_section )
@@ -315,6 +349,9 @@ class ProfileRepository():
                 break
         return exists
 
+    def build_priority(self, name, value):
+        return f'{name}={self.filter_priority(value)}'
+
     def insert_priority(
             self, profile: str, parameter_name: str, value: int = DEFAULT_PRIORITY
         ):
@@ -326,7 +363,7 @@ class ProfileRepository():
         )
         insert = self.insert_dict_values_section(
             dict_values_section,
-            value=f'{parameter_name}={self.filter_priority(value=value)}'
+            value=self.build_priority( parameter_name, value )
         )
 
         if insert:
@@ -386,8 +423,16 @@ class ProfileRepository():
             dict_priorities.update( { split_line[0]: split_line[1] }  )
         return dict_priorities
 
-    def remove_priority( self, profile: str, value: str ):
+    def remove_build_priority( self, profile: str, value: str ):
         return self.remove_simple_value( profile, SECTION_PRIORITY, value )
+
+    def remove_priority(self, profile, parameter_name, value ):
+        remove = False
+        if isinstance(parameter_name, str) and isinstance( value, int):
+            text = self.build_priority( parameter_name, value )
+            remove = self.remove_build_priority( profile, text )
+        return remove
+
 
     def get_priority_list(self, profile:str ):
         '''

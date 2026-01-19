@@ -48,7 +48,7 @@ class TextRepository:
         return text.replace(' ', '').split(',')
 
     def normalize_text(self, text):
-        return text.replace(' ', '').lower()
+        return ignore_comment( text.replace(' ', '').lower(), '#' )
 
     def detect_line_as_parameter(self, line, parameter_name):
         return self.normalize_text( line ).startswith( self.normalize_text(f'{parameter_name}=') )
