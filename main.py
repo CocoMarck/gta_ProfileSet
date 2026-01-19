@@ -37,18 +37,36 @@ print(
 profile_repository = ProfileRepository( text_repository )
 print(
     profile_repository.get_profiles(),
+
+    ## Parents
     profile_repository.write_parents( 'Default', ['hola', 'adios'] ),
     profile_repository.get_parents( 'Default' ),
+
+    ## Priority
     profile_repository.save_priority( 'Default', 'cocos' ),
     profile_repository.get_priorities( 'Default' ),
+
+    ## IgnoreFiles
     profile_repository.save_ignore_file( 'Default', 'big-headshot.asi' ),
     profile_repository.save_ignore_file( 'Default', 'shell.asi' ),
     profile_repository.remove_ignore_file( 'Default', 'shell.asi' ),
     profile_repository.get_ignore_files( 'Default' ),
+
+    ## IgnoreMods
     profile_repository.save_ignore_mod( 'Default', 'Aiuda chavales' ),
     profile_repository.get_ignore_mods( 'Default' ),
+
+    ## IncludeMods
     profile_repository.save_include_mod( 'Default', 'ModIncluidoPascalCase' ),
     profile_repository.get_include_mods( 'Default' ),
+
+    ## ExclusiveMods
     profile_repository.save_exclusive_mod( 'Default', 'SoloVip' ),
-     profile_repository.get_exclusive_mods( 'Default' ),
+    profile_repository.get_exclusive_mods( 'Default' ),
+
+    ## Create remove, and rename profile
+    profile_repository.remove( 'esto-es-la-vida-real' ),
+    profile_repository.insert( 'Esto es la vida Real' ),
+
+    profile_repository.save_exclusive_mod( 'coca-cola-espuma', 'Saludos' ),
 )

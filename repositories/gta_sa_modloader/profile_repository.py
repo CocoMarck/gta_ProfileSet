@@ -80,6 +80,8 @@ class ProfileRepository():
     def get_dict_values_section(self, profile, section):
         '''
         Diccionario, que establece donde poner los valores, con este diccinoario se puede construir el `modloader.ini`, con los cambios necesarios.
+
+        La determiniación de la sección como la linea final, estaba mal, ahora deberia jalar.
         '''
         # Obtener datos
         text_lines = self.text_repository.get_lines()
@@ -97,25 +99,26 @@ class ProfileRepository():
 
         # Determinar lineas de escritura de valores
         line_number = 0
-        final_line_number = None
+        final_section_line_number = None
         for line in text_lines:
             line = self.text_repository.dismiss_comment( line )
             if line_number > dict_section_line_numbers[section]:
-                if self.is_profile_section( line ) and final_line_number == None:
-                    final_line_number = line_number
+                if self.is_profile_section( line ) and final_section_line_number == None:
+                    final_section_line_number = line_number
                     break
                 if line.replace(' ', '') != '':
                     dict_values_section['line_values'].append( line )
             line_number += 1
-        the_section_is_the_final_line = line_number-1 == dict_section_line_numbers[section]
+        the_section_is_the_final_line = line_number == len(text_lines)
 
         # Despues de lineas de valores, las lineas finales
-        if not the_section_is_the_final_line and isinstance(final_line_number, int):
+        if not the_section_is_the_final_line and isinstance(final_section_line_number, int):
             line_number = 0
             for line in text_lines:
-                if line_number >= final_line_number:
+                if line_number >= final_section_line_number:
                     dict_values_section['last_lines'].append( line )
                 line_number += 1
+
 
         # Retornar linea de valores a remplazar
         return dict_values_section
@@ -371,7 +374,7 @@ class ProfileRepository():
 
     def get_priorities(self, profile: str):
         '''
-        Obtener pioridades
+        Obtener diccionario de pioridades
         '''
         dict_values_section = self.get_dict_values_section( profile, SECTION_PRIORITY )
         dict_priorities = {}
@@ -383,8 +386,14 @@ class ProfileRepository():
     def remove_priority( self, profile: str, value: str ):
         return self.remove_simple_value( profile, SECTION_PRIORITY, value )
 
+    def get_priority_list(self, profile:str ):
+        '''
+        Obtener lista de lineas de pioridades.
+        '''
+        return self.get_simple_values( profile, SECTION_PRIORITY )
 
-    # IgnoreFiles IgnoreMods IncludeMods ExclusiveMods
+
+    # IgnoreFiles
     def save_ignore_file( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_IGNORE_FILES, value )
 
@@ -394,20 +403,117 @@ class ProfileRepository():
     def get_ignore_files(self, profile:str ):
         return self.get_simple_values( profile, SECTION_IGNORE_FILES )
 
+    # IgnoreMods
     def save_ignore_mod( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_IGNORE_MODS, value )
+
+    def remove_ignore_mod( self, profile: str, value: str ):
+        return self.remove_simple_value( profile, SECTION_IGNORE_MODS, value )
 
     def get_ignore_mods(self, profile:str ):
         return self.get_simple_values( profile, SECTION_IGNORE_MODS )
 
+    # IncludeMods
     def save_include_mod( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_INCLUDE_MODS, value )
+
+    def remove_include_mod( self, profile: str, value: str ):
+        return self.remove_simple_value( profile, SECTION_INCLUDE_MODS, value )
 
     def get_include_mods(self, profile:str ):
         return self.get_simple_values( profile, SECTION_INCLUDE_MODS )
 
+    # ExclusiveMods
     def save_exclusive_mod( self, profile: str, value: str ):
         return self.save_simple_value( profile, SECTION_EXCLUSIVE_MODS, value )
 
+    def remove_exclusive_mod( self, profile: str, value: str ):
+        return self.remove_simple_value( profile, SECTION_EXCLUSIVE_MODS, value )
+
     def get_exclusive_mods(self, profile:str ):
         return self.get_simple_values( profile, SECTION_EXCLUSIVE_MODS )
+
+    # Profile moment
+    def get_new_lines(self, profile: str):
+        formatted_profile = self.text_repository.in_kebab_format( profile )
+        new_lines = [
+            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_CONFIG}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_PRIORITY}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_IGNORE_FILES}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_IGNORE_MODS}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_INCLUDE_MODS}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{formatted_profile}.{SECTION_EXCLUSIVE_MODS}]',
+            '',
+            '',
+        ]
+        lines = self.text_repository.get_lines()
+        lines.extend( new_lines )
+        return lines
+
+    ## insert profile
+    def insert(self, profile: str):
+        lines = self.get_new_lines( profile )
+        self.text_repository.write_lines( lines )
+        return True
+
+    ## renombrar profile
+    def rename(self, profile: str, new_name: str):
+        profiles = self.get_profiles()
+        new_name = self.text_repository.in_kebab_format( new_name )
+        rename = (
+            not (new_name in profiles) and
+            new_name != self.text_repository.in_kebab_format(DEFAULT_PROFILE)
+        )
+        if rename:
+            profile_line_numbers = self.get_section_line_numbers( profile ).values()
+            lines = self.text_repository.get_lines()
+            for number in profile_line_numbers:
+                lines[number] = lines[number].replace( profile, new_name )
+            self.text_repository.write_lines( lines )
+        return rename
+
+    ## remove profile
+    def remove(self, profile: str ):
+        '''
+        Renombrar pefil.
+        Funciona, pero elimina lineas vacias del perfir anterior/encima. No deberia ser un problema.
+        '''
+        remove = profile in self.get_profiles()
+        if remove:
+            profile_line_numbers = self.get_section_line_numbers( profile ).values()
+            min_profile_number = min(profile_line_numbers)
+            max_profile_number =  max(profile_line_numbers)
+
+            lines = self.text_repository.get_lines()
+            count = 0
+            number_of_lines_to_ignore = []
+            for line in lines:
+                in_range = count >= min_profile_number and count <= max_profile_number
+                out_range = count > max_profile_number
+                ignore = False
+                if in_range:
+                    ignore = True
+                if out_range:
+                    if line.replace(' ', '').startswith(f'[{DOMAIN_PROFILES}.'):
+                        break
+                    else:
+                        ignore = True
+                if ignore:
+                    number_of_lines_to_ignore.append( count )
+                count += 1
+
+            # Nuevas lineas
+            new_lines = []
+            for index in range( 0, len(lines) ):
+                if not (index in number_of_lines_to_ignore):
+                    new_lines.append( lines[index] )
+
+            self.text_repository.write_lines(new_lines)
+        return remove
+
+
