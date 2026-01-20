@@ -1,5 +1,6 @@
 from core.system_util import get_system
 import subprocess
+import pathlib
 
 from models.gta_sa_modloader import ProfileModel, FolderModel
 from repositories.gta_sa_modloader.path_repository import PathRepository
@@ -14,16 +15,20 @@ from repositories.gta_sa_modloader.profile_repository import ProfileRepository
 class GTASAModloaderController():
     def __init__(
         self, folder_model: FolderModel, profile_model: ProfileModel,
-        path_repository: PathRepository
+        gta_sa_dir: pathlib.Path
     ):
         self.folder_model = folder_model
         self.profile_model = profile_model
 
         # Repository
-        self.path_repository = path_repository
+        self.path_repository = PathRepository( gta_sa_dir )
         self.text_repository = TextRepository( self.path_repository.modloader_file )
         self.folder_repository = FolderRepository( self.text_repository )
         self.profile_repository = ProfileRepository( self.text_repository )
+
+
+    def get_profiles(self):
+        return self.profile_repository.get_profiles()
 
 
     def load_profile(self):
@@ -77,6 +82,8 @@ class GTASAModloaderController():
         write = False
         if name in self.profile_repository.get_profiles():
             write = self.folder_repository.write_profile( name )
+        if write:
+            self.load_folder_profile()
         return write
 
     # Otros
@@ -202,3 +209,9 @@ class GTASAModloaderController():
 
     def get_mod_dirs(self):
         self.path_repository.get_mod_dirs()
+
+
+    # Obtener texto
+    def get_ini_text(self):
+        return self.text_repository.get_text()
+

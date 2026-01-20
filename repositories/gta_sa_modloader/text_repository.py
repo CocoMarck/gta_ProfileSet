@@ -52,3 +52,17 @@ class TextRepository:
 
     def detect_line_as_parameter(self, line, parameter_name):
         return self.normalize_text( line ).startswith( self.normalize_text(f'{parameter_name}=') )
+
+
+    def get_text(self):
+        '''
+        Obtener lineas de texto, del archivo `modlaoder.ini`
+        '''
+        text = ''
+        if self.modloader_file.exists():
+            # Leer el archivo, establecer lineas.
+            text = read_text(
+                file_and_path=self.modloader_file, option='ModeText', encoding=ENCODING
+            )
+
+        return text
