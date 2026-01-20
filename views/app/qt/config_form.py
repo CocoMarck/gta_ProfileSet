@@ -1,5 +1,9 @@
 from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloaderController
 
+
+# GUI
+from views.dialogs.qt import (SetItemDialog, SetPathDialog)
+
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
@@ -27,6 +31,10 @@ class ConfigForm(QWidget):
         self.checkboxIgnoreAllMods.stateChanged.connect( self.on_ignore_all_mods )
         self.checkboxExcludeAllMods.stateChanged.connect( self.on_exclude_all_mods )
 
+        # Botones
+        self.buttonAddParents.clicked.connect( self.on_add_parents )
+        self.buttonRemoveParents.clicked.connect( self.on_remove_parents )
+
     def set_ignore_all_mods(self):
         if self.profile_model.ignore_all_mods:
             self.checkboxIgnoreAllMods.setCheckState( Qt.CheckState.Checked )
@@ -39,9 +47,16 @@ class ConfigForm(QWidget):
         else:
             self.checkboxExcludeAllMods.setCheckState( Qt.CheckState.Unchecked )
 
+    def set_parents(self):
+        text = ''
+        for parent in self.profile_model.parents:
+            text += f'{parent}\n'
+        self.texteditParents.setText( text[:-1] )
+
     def update(self):
         self.set_ignore_all_mods()
         self.set_exclude_all_mods()
+        self.set_parents()
 
     def on_ignore_all_mods(self, state):
         state = Qt.CheckState(state)
@@ -52,3 +67,25 @@ class ConfigForm(QWidget):
         state = Qt.CheckState(state)
         value = state == Qt.CheckState.Checked
         self.modloader_controller.update_exclude_all_mods( value )
+
+    def on_add_parents(self):
+        set_item_dialog = SetItemDialog(
+            self, items=self.modloader_controller.get_profiles(),
+            checkable=True, size=[256, 256]
+        )
+        set_item_dialog.exec()
+        items = set_item_dialog.get_item()
+        if isinstance(items, list):
+            self.modloader_controller.save_parents( items )
+            self.set_parents()
+
+    def on_remove_parents(self):
+        set_item_dialog = SetItemDialog(
+            self, items=self.profile_model.parents,
+            checkable=True, size=[256, 256]
+        )
+        set_item_dialog.exec()
+        items = set_item_dialog.get_item()
+        if isinstance(items, list):
+            self.modloader_controller.remove_parents( items )
+            self.set_parents()

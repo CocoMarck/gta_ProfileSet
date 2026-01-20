@@ -1,19 +1,7 @@
-# GTASAModloaderController
-from models.gta_sa_modloader import ProfileModel, FolderModel
-#from repositories.gta_sa_modloader.path_repository import PathRepository
-#from repositories.gta_sa_modloader.text_repository import TextRepository
-#from repositories.gta_sa_modloader.folder_repository import FolderRepository
-#from repositories.gta_sa_modloader.profile_repository import ProfileRepository
 from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloaderController
 
 # Rutas
-from config.paths import ICON_FILE, MAIN_WINDOW_UI_FILE, GTA_SA_DIR
-
-# Controller
-profile_model = ProfileModel()
-folder_model = FolderModel()
-modloader_controller = GTASAModloaderController( folder_model, profile_model, GTA_SA_DIR )
-modloader_controller.sync_active_profile()
+from config.paths import ICON_FILE, MAIN_WINDOW_UI_FILE
 
 
 # GUI
@@ -48,7 +36,7 @@ from .config_form import ConfigForm
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, modloader_controller: GTASAModloaderController, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.setWindowTitle( 'Modloader Controller' )
@@ -56,8 +44,13 @@ class MainWindow(QMainWindow):
         self.resize( 512, 256 )
         uic.loadUi( MAIN_WINDOW_UI_FILE, self)
 
+        # Controller
+        self.modloader_controller = modloader_controller
+        self.profile_model = self.modloader_controller.profile_model
+        self.folder_model = self.modloader_controller.folder_model
+
         # Tabs
-        self.config_form = ConfigForm( modloader_controller )
+        self.config_form = ConfigForm( self.modloader_controller )
         self.tabWidget.addTab( self.config_form, 'Config' ) # Index 0
 
         self.tabWidget.currentChanged.connect( self.on_tab_changed )
@@ -78,44 +71,44 @@ class MainWindow(QMainWindow):
         self.config_form.update()
 
     def on_current_profile(self):
-        self.labelCurrentProfile.setText( str(profile_model.profile) )
+        self.labelCurrentProfile.setText( str(self.profile_model.profile) )
 
     def on_current_folder_profile(self):
-        self.labelCurrentFolderProfile.setText( str(folder_model.profile) )
+        self.labelCurrentFolderProfile.setText( str(self.folder_model.profile) )
 
     def on_open_profile(self):
         set_item_dialog = SetItemDialog(
-            self, items=modloader_controller.get_profiles(),
+            self, items=self.modloader_controller.get_profiles(),
             checkable=False, size=[256, 256]
         )
         set_item_dialog.exec()
         item = set_item_dialog.get_item()
         if isinstance(item, str):
-            modloader_controller.select_profile( item )
+            self.modloader_controller.select_profile( item )
             self.on_current_profile()
             self.update_forms()
 
     def on_set_folder_profile(self):
         set_item_dialog = SetItemDialog(
-            self, items=modloader_controller.get_profiles(),
+            self, items=self.modloader_controller.get_profiles(),
             checkable=False, size=[256, 256]
         )
         set_item_dialog.exec()
         item = set_item_dialog.get_item()
         if isinstance(item, str):
-            modloader_controller.set_folder_profile( item )
+            self.modloader_controller.set_folder_profile( item )
             self.on_current_folder_profile()
 
     def on_get_ini_text(self):
-        print( modloader_controller.get_ini_text() )
+        print( self.modloader_controller.get_ini_text() )
 
 
 # Contruir
-def build_app():
+def build_app( modloader_controller: GTASAModloaderController ):
     app = QApplication(sys.argv)
     #app.setStyleSheet( qss_style )
 
-    window = MainWindow()
+    window = MainWindow( modloader_controller )
     window.show()
 
     sys.exit( app.exec() )

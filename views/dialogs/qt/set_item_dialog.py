@@ -49,8 +49,7 @@ class SetItemDialog( QDialog ):
         for i in self.items:
             button = QPushButton( str(i) )
             button.setCheckable(checkable)
-            if self.checkable == False:
-                button.clicked.connect( partial(self.on_button_item, button=button) )
+            button.clicked.connect( partial(self.on_button_item, button=button) )
             self.button_dict.update( {button: i} )
             self.widget_buttons_vbox.addWidget( button )
 
@@ -82,11 +81,11 @@ class SetItemDialog( QDialog ):
 
 
     def on_button_item(self, button):
-        self.selected_items = []
         if self.checkable:
-            for button in self.button_dict.keys():
-                if button.isChecked():
-                    self.selected_items.append( self.button_dict[button] )
+            self.selected_items = []
+            for b in self.button_dict.keys():
+                if b.isChecked():
+                    self.selected_items.append( self.button_dict[b] )
         else:
             self.selected_items = self.button_dict[button]
             self.accept()
