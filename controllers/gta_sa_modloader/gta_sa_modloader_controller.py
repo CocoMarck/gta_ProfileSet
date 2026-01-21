@@ -206,11 +206,11 @@ class GTASAModloaderController():
         return remove
 
     ## Mod Files, and Directorys
-    def get_mod_files(self):
-        return self.path_repository.get_mod_files()
+    def get_mod_file_names(self):
+        return [f.name for f in self.path_repository.get_mod_files()]
 
-    def get_mod_dirs(self):
-        return self.path_repository.get_mod_dirs()
+    def get_mod_dir_names(self):
+        return [d.name for d in self.path_repository.get_mod_dirs()]
 
 
     # Obtener texto

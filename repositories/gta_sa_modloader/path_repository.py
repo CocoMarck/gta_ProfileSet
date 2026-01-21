@@ -28,7 +28,7 @@ class PathRepository:
         mods = []
         for path in sorted( self.modloader_dir.glob("*") ):
             if path.is_dir():
-                mods.append( path.name )
+                mods.append( path )
         return mods
 
     def is_mod_file( self, path: pathlib.Path ):
@@ -38,7 +38,7 @@ class PathRepository:
         mod_files = []
         for f in self.get_dict_path()['file']:
             if self.is_mod_file( f ):
-                mod_files.append( f.name )
+                mod_files.append( f )
         return mod_files
 
 

@@ -61,7 +61,7 @@ class PriorityForm(QWidget):
 
     def on_add_priorities(self):
         set_item_dialog = SetItemDialog(
-            self, items=self.modloader_controller.get_mod_dirs(),
+            self, items=self.modloader_controller.get_mod_dir_names(),
             checkable=True, size=[256, 256]
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
