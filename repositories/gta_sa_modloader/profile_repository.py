@@ -1,4 +1,4 @@
-from core.text_util import ignore_comment
+from core.text_util import ignore_comment, abc_list, ignore_text_filter, PREFIX_ABC, PREFIX_NUMBER
 from .text_repository import TextRepository
 from config.constants import (
     DOMAIN_PROFILES, SECTION_CONFIG, SECTION_PRIORITY, SECTION_IGNORE_FILES, SECTION_IGNORE_MODS,
@@ -6,6 +6,7 @@ from config.constants import (
     EXCLUDE_ALL_MODS_PARAMETER, PARENTS_PARAMETER, PROFILE_CONFIG_PARAMETERS, EMPTY_VALUE,
     MAX_PRIORITY, DEFAULT_PRIORITY, DEFAULT_PROFILE
 )
+PROFILE_NAME_PREFIX = PREFIX_ABC + '-_' + PREFIX_NUMBER
 
 
 class ProfileRepository():
@@ -16,7 +17,9 @@ class ProfileRepository():
         return line.startswith( f'[{DOMAIN_PROFILES}.' )
 
     def _normalize_profile(self, profile:str):
-        return self.text_repository.in_kebab_format( text=profile )
+        return ignore_text_filter(
+            self.text_repository.in_kebab_format( text=profile ), PROFILE_NAME_PREFIX
+        )
 
     def get_profiles(self):
         '''
@@ -31,7 +34,7 @@ class ProfileRepository():
                 profile = text_line.split('.')
                 if profile[2] == 'Config':
                     profiles.append( profile[1] )
-        return profiles
+        return abc_list(profiles) # En orden abecadario
 
     # Insartar o acutalizar datos en sección de perfil
     def get_section_line_numbers( self, profile: str ):
@@ -129,7 +132,7 @@ class ProfileRepository():
         '''
         final_text_lines = []
         final_text_lines.extend( dict_values_section['first_lines'] )
-        final_text_lines.extend( dict_values_section['line_values'] )
+        final_text_lines.extend( abc_list(dict_values_section['line_values']) ) # Ordenar en abecadrio
         final_text_lines.append( '' )
         final_text_lines.extend( dict_values_section['last_lines'] )
 
@@ -519,7 +522,9 @@ class ProfileRepository():
         '''
         Remover pefil
         '''
-        remove = profile in self.get_profiles()
+        exists = (profile in self.get_profiles())
+        is_the_default_profile = profile == DEFAULT_PROFILE
+        remove = exists and (not is_the_default_profile)
         if remove:
             profile_line_numbers = self.get_section_line_numbers( profile ).values()
             min_profile_number = min(profile_line_numbers)

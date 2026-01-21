@@ -1,9 +1,6 @@
 from core.text_util import ignore_comment
 from .text_repository import TextRepository
-
-DOMAIN_FOLDER = 'Folder'
-SECTION_CONFIG = 'Config'
-PROFILE_PARAMETER = "Profile"
+from config.constants import DOMAIN_FOLDER, SECTION_CONFIG, PROFILE_PARAMETER
 
 
 class FolderRepository:

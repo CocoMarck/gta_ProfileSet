@@ -6,23 +6,23 @@
         <!-- Menu -->
         <widget class="QMenuBar" name="menuBar">
 
-            <widget class="QMenu" name="fileMenu">
+            <widget class="QMenu" name="profileMenu">
                 <property name="title">
-                    <string>file</string>
+                    <string>profile</string>
                 </property>
-                <addaction name="actionOpenProfile"/>
+                <addaction name="actionLoadProfile"/>
                 <addaction name="actionSaveProfile"/>
                 <addaction name="actionRemoveProfile"/>
             </widget>
-            <addaction name="fileMenu"/>
+            <addaction name="profileMenu"/>
             <addaction name="actionSetFolderProfile"/>
             <addaction name="actionStartGame"/>
         </widget>
 
         <!-- Menu actions -->
-        <action name="actionOpenProfile">
+        <action name="actionLoadProfile">
             <property name="text">
-                <string>open profile</string>
+                <string>load</string>
             </property>
         </action>
 
@@ -34,13 +34,13 @@
 
         <action name="actionSaveProfile">
             <property name="text">
-                <string>save profile</string>
+                <string>save</string>
             </property>
         </action>
 
         <action name="actionRemoveProfile">
             <property name="text">
-                <string>remove profile</string>
+                <string>remove</string>
             </property>
         </action>
 
@@ -58,9 +58,9 @@
                     <layout class="QHBoxLayout" name="hboxProfile">
 
                         <item>
-                            <widget class="QLabel" name="labelProfile">
+                            <widget class="QLabel" name="labelLoadedProfile">
                                 <property name="text">
-                                    <string>profile: </string>
+                                    <string>loaded profile: </string>
                                 </property>
                             </widget>
                         </item>

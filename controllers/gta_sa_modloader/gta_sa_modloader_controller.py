@@ -1,4 +1,4 @@
-from config.constants import MAX_PRIORITY, DEFAULT_PRIORITY
+from config.constants import MAX_PRIORITY, DEFAULT_PRIORITY, DEFAULT_PROFILE
 
 from core.system_util import get_system
 import subprocess
@@ -71,6 +71,7 @@ class GTASAModloaderController():
             self.profile_model.ignore_mods = None
             self.profile_model.include_mods = None
             self.profile_model.exclusive_mods = None
+            self.set_and_sync_to_default_profile()
 
 
     # Folder section
@@ -94,6 +95,11 @@ class GTASAModloaderController():
         self.profile_model.profile = self.folder_model.profile
         self.load_profile()
 
+    def set_and_sync_to_default_profile(self):
+        self.set_folder_profile( DEFAULT_PROFILE )
+        self.sync_active_profile()
+
+    # Seleccionar perfil
     def select_profile(self, name):
         self.profile_model.profile = name
         self.load_profile()
@@ -110,7 +116,7 @@ class GTASAModloaderController():
         if isinstance(name, str):
             remove = self.profile_repository.remove( name )
         if remove:
-            self.load_profile()
+            self.set_and_sync_to_default_profile()
         return remove
 
     # Boleanos

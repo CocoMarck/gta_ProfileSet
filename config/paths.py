@@ -7,7 +7,7 @@ ICON_DIR = resource_loader.resources_dir.joinpath( 'icons' )
 NOTA_DEFAULT_DIR = resource_loader.resources_dir.joinpath( 'nota' )
 
 # Archivos
-ICON_FILE = ICON_DIR.joinpath( 'gta-sa-modloader-controller.png' )
+ICON_FILE = ICON_DIR.joinpath( 'gta_sa_modloader_controller.png' )
 
 # XML GUI
 VIEWS_DIR = resource_loader.base_dir.joinpath( 'views' )

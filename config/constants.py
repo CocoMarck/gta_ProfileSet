@@ -1,5 +1,6 @@
 # Dominios
 DOMAIN_PROFILES = 'Profiles'
+DOMAIN_FOLDER = 'Folder'
 
 # Secciones
 SECTION_CONFIG = 'Config'
@@ -17,6 +18,7 @@ SIMPLE_PROFILE_SECTIONS = (
 )
 
 # Parametros
+PROFILE_PARAMETER = "Profile"
 IGNORE_ALL_MODS_PARAMETER = "IgnoreAllMods"
 EXCLUDE_ALL_MODS_PARAMETER = "ExcludeAllMods"
 PARENTS_PARAMETER = "Parents"

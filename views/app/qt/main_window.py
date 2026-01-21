@@ -81,8 +81,10 @@ class MainWindow(QMainWindow):
         }
 
         # Actions
-        self.actionOpenProfile.triggered.connect( self.on_open_profile )
+        self.actionLoadProfile.triggered.connect( self.on_load_profile )
         self.actionSetFolderProfile.triggered.connect( self.on_set_folder_profile )
+        self.actionSaveProfile.triggered.connect( self.on_save_profile )
+        self.actionRemoveProfile.triggered.connect( self.on_remove_profile )
 
         # Inicializar valores
         self.on_current_profile()
@@ -102,7 +104,7 @@ class MainWindow(QMainWindow):
     def on_current_folder_profile(self):
         self.labelCurrentFolderProfile.setText( str(self.folder_model.profile) )
 
-    def on_open_profile(self):
+    def on_load_profile(self):
         set_item_dialog = SetItemDialog(
             self, items=self.modloader_controller.get_profiles(),
             checkable=False, size=[256, 256]
@@ -127,6 +129,25 @@ class MainWindow(QMainWindow):
 
     def on_get_ini_text(self):
         print( self.modloader_controller.get_ini_text() )
+
+    def on_save_profile(self):
+        name, ok = QInputDialog.getText(self, 'save-profile', 'name')
+        if name and ok:
+            self.modloader_controller.save_profile( name )
+
+    def on_remove_profile(self):
+        set_item_dialog = SetItemDialog(
+            self, items=self.modloader_controller.get_profiles(),
+            checkable=False, size=[256, 256]
+        )
+        if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
+            item = set_item_dialog.get_item()
+            if isinstance(item, str):
+                remove = self.modloader_controller.remove_profile( item )
+                if remove:
+                    self.update_forms()
+                    self.on_current_folder_profile()
+                    self.on_current_profile()
 
 
 # Contruir
