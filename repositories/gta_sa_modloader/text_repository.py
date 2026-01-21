@@ -45,7 +45,10 @@ class TextRepository:
         return text
 
     def str_to_list(self, text: ''):
-        return text.replace(' ', '').split(',')
+        if text.replace(' ', '') == '':
+            return []
+        else:
+            return text.replace(' ', '').split(',')
 
     def normalize_text(self, text):
         return ignore_comment( text.replace(' ', '').lower(), '#' )

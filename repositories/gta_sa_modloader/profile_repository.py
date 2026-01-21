@@ -262,8 +262,11 @@ class ProfileRepository():
                 if not (index in index_to_ignore):
                     new_parents.append( parents[index] )
             if remove:
+                parents_str = self.text_repository.list_to_str( new_parents )
+                if parents_str == '':
+                    parents_str = '$None'
                 remove = self.update_config(
-                    profile, PARENTS_PARAMETER, self.text_repository.list_to_str( new_parents )
+                    profile, PARENTS_PARAMETER, parents_str
                 )
         return remove
 
