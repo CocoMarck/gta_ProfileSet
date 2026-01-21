@@ -7,6 +7,7 @@ from views.dialogs.qt import (SetItemDialog, SetPathDialog)
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
+    QDialog,
     QWidget,
     QTableWidget,
     QTableWidgetItem
@@ -73,19 +74,19 @@ class ConfigForm(QWidget):
             self, items=self.modloader_controller.get_profiles(),
             checkable=True, size=[256, 256]
         )
-        set_item_dialog.exec()
-        items = set_item_dialog.get_item()
-        if isinstance(items, list):
-            self.modloader_controller.save_parents( items )
-            self.set_parents()
+        if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
+            items = set_item_dialog.get_item()
+            if isinstance(items, list):
+                self.modloader_controller.save_parents( items )
+                self.set_parents()
 
     def on_remove_parents(self):
         set_item_dialog = SetItemDialog(
             self, items=self.profile_model.parents,
             checkable=True, size=[256, 256]
         )
-        set_item_dialog.exec()
-        items = set_item_dialog.get_item()
-        if isinstance(items, list):
-            self.modloader_controller.remove_parents( items )
-            self.set_parents()
+        if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
+            items = set_item_dialog.get_item()
+            if isinstance(items, list):
+                self.modloader_controller.remove_parents( items )
+                self.set_parents()

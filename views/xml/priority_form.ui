@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>PriorityForm</class>
+
+    <!-- Widget central -->
+    <widget class="QWidget" name="centralWidget">
+    <layout class="QVBoxLayout" name="mainLayout">
+
+    <!-- ScrollArea -->
+    <item>
+    <widget class="QScrollArea" name="scrollArea">
+        <property name="widgetResizable">
+            <bool>true</bool>
+        </property>
+        <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+        </property>
+
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+            <layout class="QFormLayout" name ="scrollAreaFormLayout">
+            </layout>
+        </widget>
+
+    </widget>
+    </item>
+
+    <!-- Agragar y remover -->
+    <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+                <widget class="QPushButton" name="buttonAddPriorities">
+                    <property name="text"><string>add</string></property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QPushButton" name="buttonRemovePriorities">
+                    <property name="text"><string>remove</string></property>
+                </widget>
+            </item>
+        </layout>
+    </item>
+
+    <!-- Central widget para centrar todo -->
+    </layout>
+    </widget>
+
+    <resources/>
+    <connections/>
+</ui>

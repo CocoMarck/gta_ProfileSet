@@ -1,3 +1,5 @@
+from config.constants import MAX_PRIORITY, DEFAULT_PRIORITY
+
 from core.system_util import get_system
 import subprocess
 import pathlib
@@ -139,7 +141,7 @@ class GTASAModloaderController():
 
     # Secciones
     ## Pioridad, diccionario
-    def save_priority(self, name, value):
+    def save_priority(self, name, value=DEFAULT_PRIORITY):
         save = self.profile_repository.save_priority( self.profile_model.profile, name, value )
         if save:
             self.load_profile()
@@ -205,10 +207,10 @@ class GTASAModloaderController():
 
     ## Mod Files, and Directorys
     def get_mod_files(self):
-        self.path_repository.get_mod_files()
+        return self.path_repository.get_mod_files()
 
     def get_mod_dirs(self):
-        self.path_repository.get_mod_dirs()
+        return self.path_repository.get_mod_dirs()
 
 
     # Obtener texto

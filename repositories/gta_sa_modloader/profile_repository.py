@@ -1,34 +1,11 @@
 from core.text_util import ignore_comment
 from .text_repository import TextRepository
-
-
-DOMAIN_PROFILES = 'Profiles'
-
-SECTION_CONFIG = 'Config'
-SECTION_PRIORITY = 'Priority'
-SECTION_IGNORE_FILES = 'IgnoreFiles'
-SECTION_IGNORE_MODS = 'IgnoreMods'
-SECTION_INCLUDE_MODS = 'IncludeMods'
-SECTION_EXCLUSIVE_MODS = 'ExclusiveMods'
-PROFILE_SECTIONS = (
-    SECTION_CONFIG, SECTION_PRIORITY, SECTION_IGNORE_FILES, SECTION_IGNORE_MODS,
-    SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS
+from config.constants import (
+    DOMAIN_PROFILES, SECTION_CONFIG, SECTION_PRIORITY, SECTION_IGNORE_FILES, SECTION_IGNORE_MODS,
+    SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS, PROFILE_SECTIONS,  IGNORE_ALL_MODS_PARAMETER,
+    EXCLUDE_ALL_MODS_PARAMETER, PARENTS_PARAMETER, PROFILE_CONFIG_PARAMETERS, EMPTY_VALUE,
+    MAX_PRIORITY, DEFAULT_PRIORITY, DEFAULT_PROFILE
 )
-
-IGNORE_ALL_MODS_PARAMETER = "IgnoreAllMods"
-EXCLUDE_ALL_MODS_PARAMETER = "ExcludeAllMods"
-PARENTS_PARAMETER = "Parents"
-
-PROFILE_CONFIG_PARAMETERS = [
-    IGNORE_ALL_MODS_PARAMETER, EXCLUDE_ALL_MODS_PARAMETER, PARENTS_PARAMETER
-]
-
-# Limites
-MAX_PRIORITY = 100
-
-# Default
-DEFAULT_PRIORITY = 50
-DEFAULT_PROFILE = 'Default'
 
 
 class ProfileRepository():
@@ -229,13 +206,13 @@ class ProfileRepository():
             new_parents = []
             parents = self.get_parents( profile )
             for new_parent in values:
-                if not ( self.text_repository.normalize_text(new_parent) in parents):
+                if not new_parent in parents:
                     new_parents.append( new_parent )
             if new_parents != []:
                 parents.extend(new_parents)
                 count = 0
                 for parent in parents:
-                    if parent == '$None':
+                    if parent == EMPTY_VALUE:
                         parents.pop( count )
                     count += 1
                 write = self.update_config(
@@ -264,14 +241,14 @@ class ProfileRepository():
             if remove:
                 parents_str = self.text_repository.list_to_str( new_parents )
                 if parents_str == '':
-                    parents_str = '$None'
+                    parents_str = EMPTY_VALUE
                 remove = self.update_config(
                     profile, PARENTS_PARAMETER, parents_str
                 )
         return remove
 
     def clear_parents(self, profile):
-        remove = self.update_config( profile, PARENTS_PARAMETER, '$None' )
+        remove = self.update_config( profile, PARENTS_PARAMETER, EMPTY_VALUE )
         return remove
 
 
@@ -423,7 +400,7 @@ class ProfileRepository():
         dict_priorities = {}
         for line in dict_values_section['line_values']:
             split_line = line.split('=')
-            dict_priorities.update( { split_line[0]: split_line[1] }  )
+            dict_priorities.update( { split_line[0]: int(split_line[1]) }  )
         return dict_priorities
 
     def remove_build_priority( self, profile: str, value: str ):
@@ -490,7 +467,7 @@ class ProfileRepository():
             f'[{DOMAIN_PROFILES}.{profile}.{SECTION_CONFIG}]',
             f'{IGNORE_ALL_MODS_PARAMETER}=false',
             f'{EXCLUDE_ALL_MODS_PARAMETER}=false',
-            f'{PARENTS_PARAMETER}=$None',
+            f'{PARENTS_PARAMETER}={EMPTY_VALUE}',
             '',
             f'[{DOMAIN_PROFILES}.{profile}.{SECTION_PRIORITY}]',
             '',

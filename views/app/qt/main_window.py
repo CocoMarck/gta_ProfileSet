@@ -33,6 +33,7 @@ from PyQt6.QtCore import Qt
 
 ## Tabs
 from .config_form import ConfigForm
+from .priority_form import PriorityForm
 
 
 class MainWindow(QMainWindow):
@@ -53,7 +54,14 @@ class MainWindow(QMainWindow):
         self.config_form = ConfigForm( self.modloader_controller )
         self.tabWidget.addTab( self.config_form, 'Config' ) # Index 0
 
+        self.priority_form = PriorityForm( self.modloader_controller )
+        self.tabWidget.addTab( self.priority_form, 'Priority') # Index 1
+
         self.tabWidget.currentChanged.connect( self.on_tab_changed )
+
+        self.dict_tabs = {
+            0: self.config_form, 1: self.priority_form
+        }
 
         # Actions
         self.actionOpenProfile.triggered.connect( self.on_open_profile )
@@ -64,11 +72,12 @@ class MainWindow(QMainWindow):
         self.on_current_folder_profile()
 
     def on_tab_changed(self, index):
-        if index == 0:
-            self.config_form.update()
+        if index in self.dict_tabs.keys():
+            self.dict_tabs.update()
 
     def update_forms(self):
-        self.config_form.update()
+        for form in self.dict_tabs.values():
+            form.update()
 
     def on_current_profile(self):
         self.labelCurrentProfile.setText( str(self.profile_model.profile) )
@@ -81,23 +90,23 @@ class MainWindow(QMainWindow):
             self, items=self.modloader_controller.get_profiles(),
             checkable=False, size=[256, 256]
         )
-        set_item_dialog.exec()
-        item = set_item_dialog.get_item()
-        if isinstance(item, str):
-            self.modloader_controller.select_profile( item )
-            self.on_current_profile()
-            self.update_forms()
+        if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
+            item = set_item_dialog.get_item()
+            if isinstance(item, str):
+                self.modloader_controller.select_profile( item )
+                self.on_current_profile()
+                self.update_forms()
 
     def on_set_folder_profile(self):
         set_item_dialog = SetItemDialog(
             self, items=self.modloader_controller.get_profiles(),
             checkable=False, size=[256, 256]
         )
-        set_item_dialog.exec()
-        item = set_item_dialog.get_item()
-        if isinstance(item, str):
-            self.modloader_controller.set_folder_profile( item )
-            self.on_current_folder_profile()
+        if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
+            item = set_item_dialog.get_item()
+            if isinstance(item, str):
+                self.modloader_controller.set_folder_profile( item )
+                self.on_current_folder_profile()
 
     def on_get_ini_text(self):
         print( self.modloader_controller.get_ini_text() )
