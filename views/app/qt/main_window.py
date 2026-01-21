@@ -34,6 +34,7 @@ from PyQt6.QtCore import Qt
 ## Tabs
 from .config_form import ConfigForm
 from .priority_form import PriorityForm
+from .ignore_files_form import IgnoreFilesForm
 
 
 class MainWindow(QMainWindow):
@@ -57,10 +58,13 @@ class MainWindow(QMainWindow):
         self.priority_form = PriorityForm( self.modloader_controller )
         self.tabWidget.addTab( self.priority_form, 'Priority') # Index 1
 
+        self.ignore_files_form = IgnoreFilesForm( self.modloader_controller )
+        self.tabWidget.addTab( self.ignore_files_form, 'IgnoreFiles' )
+
         self.tabWidget.currentChanged.connect( self.on_tab_changed )
 
         self.dict_tabs = {
-            0: self.config_form, 1: self.priority_form
+            0: self.config_form, 1: self.priority_form, 2: self.ignore_files_form
         }
 
         # Actions

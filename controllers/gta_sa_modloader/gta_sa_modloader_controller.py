@@ -164,6 +164,7 @@ class GTASAModloaderController():
         remove = self.profile_repository.remove_ignore_file( self.profile_model.profile, value )
         if remove:
             self.load_profile()
+            print( self.profile_model.ignore_files )
         return remove
 
     ## IgnoreMods
