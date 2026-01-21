@@ -35,6 +35,9 @@ from PyQt6.QtCore import Qt
 from .config_form import ConfigForm
 from .priority_form import PriorityForm
 from .ignore_files_form import IgnoreFilesForm
+from .ignore_mods_form import IgnoreModsForm
+from .include_mods_form import IncludeModsForm
+from .exclusive_mods_form import ExclusiveModsForm
 
 
 class MainWindow(QMainWindow):
@@ -43,7 +46,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle( 'Modloader Controller' )
         #self.setWindowIcon( QIcon( str(ICON_FILE) )
-        self.resize( 512, 256 )
+        self.resize( 1024, 512 )
         uic.loadUi( MAIN_WINDOW_UI_FILE, self)
 
         # Controller
@@ -61,10 +64,20 @@ class MainWindow(QMainWindow):
         self.ignore_files_form = IgnoreFilesForm( self.modloader_controller )
         self.tabWidget.addTab( self.ignore_files_form, 'IgnoreFiles' )
 
+        self.ignore_mods_form = IgnoreModsForm( self.modloader_controller )
+        self.tabWidget.addTab( self.ignore_mods_form, 'IgnoreMods' )
+
+        self.include_mods_form = IncludeModsForm( self.modloader_controller )
+        self.tabWidget.addTab( self.include_mods_form, 'IncludeMods' )
+
+        self.exclusive_mods_form = ExclusiveModsForm( self.modloader_controller )
+        self.tabWidget.addTab( self.exclusive_mods_form, 'ExclusiveMods' )
+
         self.tabWidget.currentChanged.connect( self.on_tab_changed )
 
         self.dict_tabs = {
-            0: self.config_form, 1: self.priority_form, 2: self.ignore_files_form
+            0: self.config_form, 1: self.priority_form, 2: self.ignore_files_form,
+            3: self.ignore_mods_form, 4: self.include_mods_form, 5: self.exclusive_mods_form
         }
 
         # Actions

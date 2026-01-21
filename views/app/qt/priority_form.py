@@ -67,7 +67,7 @@ class PriorityForm(QWidget):
             if isinstance(items, list):
                 for name in items:
                     self.modloader_controller.save_priority( name )
-                    self.set_priorities()
+                self.set_priorities()
 
     def on_remove_priorities(self):
         set_item_dialog = SetItemDialog(
@@ -81,4 +81,4 @@ class PriorityForm(QWidget):
                     self.modloader_controller.remove_priority(
                         name, self.profile_model.priority[name]
                     )
-                    self.set_priorities()
+                self.set_priorities()
