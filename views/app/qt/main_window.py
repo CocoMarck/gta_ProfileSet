@@ -40,12 +40,16 @@ from .include_mods_form import IncludeModsForm
 from .exclusive_mods_form import ExclusiveModsForm
 
 
+
+#os.environ.setdefault("QT_QPA_PLATFORM", "xcb") # Wayland, forzar en x11, para que se vea el icon. Fix feo jejej.
+
+
 class MainWindow(QMainWindow):
     def __init__(self, modloader_controller: GTASAModloaderController, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.setWindowTitle( 'Modloader Controller' )
-        #self.setWindowIcon( QIcon( str(ICON_FILE) )
+        self.setWindowIcon( QIcon( str(ICON_FILE) ) )
         self.resize( 1024, 512 )
         uic.loadUi( MAIN_WINDOW_UI_FILE, self)
 
@@ -92,7 +96,7 @@ class MainWindow(QMainWindow):
 
     def on_tab_changed(self, index):
         if index in self.dict_tabs.keys():
-            self.dict_tabs.update()
+            self.dict_tabs[index].update()
 
     def update_forms(self):
         for form in self.dict_tabs.values():

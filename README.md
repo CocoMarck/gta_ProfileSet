@@ -6,7 +6,7 @@ Todo; desde pioridades hasta los boleanos. Menteniendo limites lógicos, y nomen
 ## Compilación con `pyinstaller`
 **Windows y GNU/Linux**
 ```bash
-pyinstaller --windowed --icon=".\resources\gta_sa_modloader_controller.png" ".\main.py"
+pyinstaller --windowed --icon=".\resources\icons\gta_sa_modloader_controller.png" ".\main.py"
 ```
 
 ## Uso
