@@ -10,6 +10,9 @@ from repositories.gta_sa_modloader.text_repository import TextRepository
 from repositories.gta_sa_modloader.folder_repository import FolderRepository
 from repositories.gta_sa_modloader.profile_repository import ProfileRepository
 
+# Log
+from utils.wrappers.log_helper import LogHelper
+
 
 
 
@@ -27,6 +30,11 @@ class GTASAModloaderController():
         self.text_repository = TextRepository( self.path_repository.modloader_file )
         self.folder_repository = FolderRepository( self.text_repository )
         self.profile_repository = ProfileRepository( self.text_repository )
+
+        # Log
+        self.log_helper = LogHelper(
+            name="GTASAModloaderController", filename = "gta_sa_modloader_controller", verbose=True, log_level="debug", save_log=False, only_the_value=True
+        )
 
 
     def get_profiles(self):
@@ -87,6 +95,9 @@ class GTASAModloaderController():
             write = self.folder_repository.write_profile( name )
         if write:
             self.load_folder_profile()
+            self.log_helper.log( f'Writing folder profile as `{name}`', 'info' )
+        else:
+            self.log_helper.log( f'The folder profile cloud not be writted as `{name}`', 'warning' )
         return write
 
     # Otros
@@ -106,9 +117,16 @@ class GTASAModloaderController():
 
     # Guardar nuevo perfil
     def save_profile(self, name):
-        save = False
+        safe_name = None
         if isinstance( name, str ):
-            save = self.profile_repository.save( name )
+            safe_name = self.profile_repository.save( name )
+
+        save = isinstance( safe_name, str )
+        if save:
+            self.log_helper.log( f'Saving profile `{name}` -> `{safe_name}`', 'info' )
+        else:
+            self.log_helper.log( f'The profile `{name}` was not saved ', 'warning' )
+
         return save
 
     def remove_profile(self, name):
@@ -117,14 +135,26 @@ class GTASAModloaderController():
             remove = self.profile_repository.remove( name )
         if remove:
             self.set_and_sync_to_default_profile()
+            self.log_helper.log( f'Removing profile `{name}`', 'info' )
+        else:
+            self.log_helper.log( f'The profile `{name}` was not removed', 'warning' )
         return remove
 
     def rename_profile(self, name, new_name):
-        rename = False
+        safe_name = None
         if isinstance(name, str) and isinstance(self.profile_model.profile, str):
-            rename = self.profile_repository.rename( name, new_name )
+            safe_name = self.profile_repository.rename( name, new_name )
+
+        rename = isinstance(safe_name, str)
         if rename:
             self.set_and_sync_to_default_profile()
+            self.log_helper.log(
+                f'Raname profile `{name}` to `{new_name}` -> `{safe_name}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The profile `{name}` could not be renamed to `{new_name}`', 'warning'
+            )
         return rename
 
     # Boleanos
@@ -132,12 +162,18 @@ class GTASAModloaderController():
         update = self.profile_repository.update_ignore_all_mods(self.profile_model.profile, value)
         if update:
             self.profile_model.ignore_all_mods = value
+            self.log_helper.log(
+                f'In `{self.profile_model.profile}` ignore all mods in `{value}`', 'info'
+            )
         return update
 
     def update_exclude_all_mods(self, value):
         update = self.profile_repository.update_exclude_all_mods(self.profile_model.profile, value)
         if update:
             self.profile_model.exclude_all_mods = value
+            self.log_helper.log(
+                f'In `{self.profile_model.profile}` exclude all mods in `{value}`', 'info'
+            )
         return update
 
     # Pioridades, lista
@@ -145,12 +181,26 @@ class GTASAModloaderController():
         save = self.profile_repository.write_parents( self.profile_model.profile, parents )
         if save:
             self.load_profile()
+            self.log_helper.log(
+                f'The parents `{parents}` was saved in `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The parents `{parents}` were not saved in `{self.profile_model.profile}`', 'warning'
+            )
         return save
 
     def remove_parents(self, parents):
         remove = self.profile_repository.remove_parents( self.profile_model.profile, parents )
         if remove:
             self.load_profile()
+            self.log_helper.log(
+                f'The parents `{parents}` was removed from `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The parents `{parents}` ware not removed from `{self.profile_model.profile}`', 'warning'
+            )
         return remove
 
     # Secciones
@@ -159,12 +209,26 @@ class GTASAModloaderController():
         save = self.profile_repository.save_priority( self.profile_model.profile, name, value )
         if save:
             self.load_profile()
+            self.log_helper.log(
+                f'The priority mod `{name}={value}` was saved in `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The priority mod `{name}` was not saved in `{self.profile_model.profile}`', 'warning'
+            )
         return save
 
     def remove_priority(self, name, value):
         remove = self.profile_repository.remove_priority( self.profile_model.profile, name, value)
         if remove:
             self.load_profile()
+            self.log_helper.log(
+                f'The priority mod `{name}` was removed form `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The priority mod `{name}` could not be removed from `{self.profile_model.profile}`', 'warning'
+            )
         return remove
 
     ## IgnoreFiles
@@ -172,12 +236,26 @@ class GTASAModloaderController():
         save = self.profile_repository.save_ignore_file( self.profile_model.profile, value )
         if save:
             self.load_profile()
+            self.log_helper.log(
+                f'The ignore file `{value}` was saved in `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The ignore file `{value}` was not saved in `{self.profile_model.profile}`', 'warning'
+            )
         return save
 
     def remove_ignore_file(self, value):
         remove = self.profile_repository.remove_ignore_file( self.profile_model.profile, value )
         if remove:
             self.load_profile()
+            self.log_helper.log(
+                f'The ignore file `{value}` was removed form `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The ignore file `{value}` could not be removed from `{self.profile_model.profile}`', 'warning'
+            )
         return remove
 
     ## IgnoreMods
@@ -185,12 +263,26 @@ class GTASAModloaderController():
         save = self.profile_repository.save_ignore_mod( self.profile_model.profile, value )
         if save:
             self.load_profile()
+            self.log_helper.log(
+                f'The ignore mod `{value}` was saved in `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The ignore mod `{value}` was not saved in `{self.profile_model.profile}`', 'warning'
+            )
         return save
 
     def remove_ignore_mod(self, value):
         remove = self.profile_repository.remove_ignore_mod( self.profile_model.profile, value )
         if remove:
             self.load_profile()
+            self.log_helper.log(
+                f'The ignore mod `{value}` was removed form `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The ignore mod `{value}` could not be removed from `{self.profile_model.profile}`', 'warning'
+            )
         return remove
 
     ## IncludeMods
@@ -198,12 +290,26 @@ class GTASAModloaderController():
         save = self.profile_repository.save_include_mod( self.profile_model.profile, value )
         if save:
             self.load_profile()
+            self.log_helper.log(
+                f'The include mod `{value}` was saved in `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The include mod `{value}` was not saved in `{self.profile_model.profile}`', 'warning'
+            )
         return save
 
     def remove_include_mod(self, value):
         remove = self.profile_repository.remove_include_mod( self.profile_model.profile, value )
         if remove:
             self.load_profile()
+            self.log_helper.log(
+                f'The include mod `{value}` was removed form `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The include mod `{value}` could not be removed from `{self.profile_model.profile}`', 'warning'
+            )
         return remove
 
     ## ExclusiveMods
@@ -211,12 +317,26 @@ class GTASAModloaderController():
         save = self.profile_repository.save_exclusive_mod( self.profile_model.profile, value )
         if save:
             self.load_profile()
+            self.log_helper.log(
+                f'The exclusive mod `{value}` was saved in `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The exclusive mod `{value}` was not saved in `{self.profile_model.profile}`', 'warning'
+            )
         return save
 
     def remove_exclusive_mod(self, value):
         remove = self.profile_repository.remove_exclusive_mod( self.profile_model.profile, value )
         if remove:
             self.load_profile()
+            self.log_helper.log(
+                f'The exclusive mod `{value}` was removed form `{self.profile_model.profile}`', 'info'
+            )
+        else:
+            self.log_helper.log(
+                f'The exclusive mod `{value}` could not be removed from `{self.profile_model.profile}`', 'warning'
+            )
         return remove
 
     ## Mod Files, and Directorys

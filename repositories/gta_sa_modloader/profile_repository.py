@@ -516,7 +516,9 @@ class ProfileRepository():
             for number in profile_line_numbers:
                 lines[number] = lines[number].replace( profile, new_name )
             self.text_repository.write_lines( lines )
-        return rename
+            return new_name
+
+        return False
 
     ## remove profile
     def remove(self, profile: str ):
@@ -562,9 +564,10 @@ class ProfileRepository():
         profile = self._normalize_profile( profile )
         exists = profile in self.get_profiles()
         if not exists:
-            return self.insert( profile )
-        else:
-            return False
+            if self.insert( profile ):
+                return profile
+
+        return False
 
 
 

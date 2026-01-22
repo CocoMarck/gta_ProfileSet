@@ -1,4 +1,5 @@
 from utils.resource_loader import ResourceLoader
+from core.text_util import not_repeat_item
 import pathlib
 
 resource_loader = ResourceLoader()
@@ -37,7 +38,7 @@ class PathRepository:
         for f in self.get_dict_path()['file']:
             if self.is_mod_file( f ):
                 mod_files.append( f )
-        return mod_files
+        return not_repeat_item( mod_files )
 
 
 
