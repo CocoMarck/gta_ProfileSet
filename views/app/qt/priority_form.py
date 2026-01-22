@@ -2,6 +2,7 @@ from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloa
 from config.constants import MAX_PRIORITY
 
 # GUI
+from views.interface_number import SET_ITEM_DIALOG_SIZE
 from functools import partial
 from views.dialogs.qt import (SetItemDialog, SetPathDialog)
 
@@ -60,7 +61,7 @@ class PriorityForm(QWidget):
     def on_add_priorities(self):
         set_item_dialog = SetItemDialog(
             self, items=self.modloader_controller.get_mod_dir_names(),
-            checkable=True, size=[256, 256]
+            checkable=True, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             items = set_item_dialog.get_item()
@@ -72,7 +73,7 @@ class PriorityForm(QWidget):
     def on_remove_priorities(self):
         set_item_dialog = SetItemDialog(
             self, items=self.profile_model.priority.keys(),
-            checkable=True, size=[256, 256]
+            checkable=True, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             items = set_item_dialog.get_item()

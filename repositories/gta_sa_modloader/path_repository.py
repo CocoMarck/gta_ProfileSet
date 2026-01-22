@@ -3,7 +3,6 @@ import pathlib
 
 resource_loader = ResourceLoader()
 
-GTA_SA_FILENAME = 'gta_sa.exe'
 MODLOADER_NAME = 'modloader'
 MODLOADER_FILENAME = f'{MODLOADER_NAME}.ini'
 MOD_EXTENSIONS = [ '.cs', '.asi' ]
@@ -11,7 +10,6 @@ MOD_EXTENSIONS = [ '.cs', '.asi' ]
 class PathRepository:
     def __init__(self, gta_sa_dir:pathlib.Path):
         self.gta_sa_dir = gta_sa_dir
-        self.gta_sa_file = self.gta_sa_dir.joinpath( GTA_SA_FILENAME )
         self.modloader_dir = self.gta_sa_dir.joinpath( MODLOADER_NAME )
         self.modloader_file = self.modloader_dir.joinpath( MODLOADER_FILENAME )
 

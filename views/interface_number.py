@@ -6,13 +6,8 @@ WINDOW_MAIN_SIZE = [
 ]
 
 SET_ITEM_DIALOG_SIZE = [
-    get_display_number( multipler=0.4, based="width" ),
-    get_display_number( multipler=0.4, based="height" )
-]
-
-SET_PATH_DIALOG_SIZE = [
-    get_display_number( multipler=0.4, based="width" ),
-    get_display_number( multipler=0.1, based="height" )
+    get_display_number( multipler=0.3, based="width" ),
+    get_display_number( multipler=0.5, based="height" )
 ]
 
 FONT_SIZE = get_display_number( multipler=0.0085, based="width" )

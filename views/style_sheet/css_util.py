@@ -17,6 +17,7 @@ def get_list_text_widget( option='Qt' ) -> list:
             'TimeEdit',
             'DateTimeEdit',
             'MenuBar',
+            'SpinBox',
         ]
         number = 0
     elif option == 'Gtk':

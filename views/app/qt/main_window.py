@@ -1,7 +1,35 @@
 from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloaderController
+from core.launcher.gta_sa_launcher import GTASALauncher
 
 # Rutas
 from config.paths import ICON_FILE, MAIN_WINDOW_UI_FILE
+
+
+
+# Style
+from views.interface_number import (
+    WINDOW_MAIN_SIZE, SET_ITEM_DIALOG_SIZE, FONT_SIZE, MARGIN_XY, PADDING_SPACE
+)
+from views.style_sheet.css_util import get_list_text_widget, text_widget_style
+FONT_FILE = "monospace"
+qss_style = ''
+for widget in get_list_text_widget('Qt'):
+    if widget == "QTextEdit":
+        qss_style += text_widget_style(
+            widget=widget, font=FONT_FILE, font_size=FONT_SIZE,
+            margin_based_font=True, padding=None, idented=4
+        )
+    elif widget == "QMenuBar":
+        qss_style += text_widget_style(
+            widget=widget, font=FONT_FILE, font_size=FONT_SIZE,
+            margin_based_font=None, padding=None, idented=4
+        )
+    else:
+        qss_style += text_widget_style(
+            widget=widget, font=FONT_FILE, font_size=FONT_SIZE,
+            margin_xy=MARGIN_XY, padding=PADDING_SPACE, idented=4
+        )
+print(qss_style)
 
 
 # GUI
@@ -45,18 +73,24 @@ from .exclusive_mods_form import ExclusiveModsForm
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, modloader_controller: GTASAModloaderController, *args, **kwargs):
+    def __init__(
+        self, modloader_controller: GTASAModloaderController, gta_sa_launcher: GTASALauncher,
+        *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
 
         self.setWindowTitle( 'Modloader Controller' )
         self.setWindowIcon( QIcon( str(ICON_FILE) ) )
-        self.resize( 1024, 512 )
+        self.resize( WINDOW_MAIN_SIZE[0], WINDOW_MAIN_SIZE[1] )
         uic.loadUi( MAIN_WINDOW_UI_FILE, self)
 
         # Controller
         self.modloader_controller = modloader_controller
         self.profile_model = self.modloader_controller.profile_model
         self.folder_model = self.modloader_controller.folder_model
+
+        # Launcher
+        self.gta_sa_launcher = gta_sa_launcher
 
         # Tabs
         self.config_form = ConfigForm( self.modloader_controller )
@@ -89,6 +123,7 @@ class MainWindow(QMainWindow):
         self.actionSetFolderProfile.triggered.connect( self.on_set_folder_profile )
         self.actionSaveProfile.triggered.connect( self.on_save_profile )
         self.actionRemoveProfile.triggered.connect( self.on_remove_profile )
+        self.actionStartGame.triggered.connect( self.on_start_game )
 
         # Inicializar valores
         self.on_current_profile()
@@ -111,7 +146,7 @@ class MainWindow(QMainWindow):
     def on_load_profile(self):
         set_item_dialog = SetItemDialog(
             self, items=self.modloader_controller.get_profiles(),
-            checkable=False, size=[256, 256]
+            checkable=False, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             item = set_item_dialog.get_item()
@@ -123,7 +158,7 @@ class MainWindow(QMainWindow):
     def on_set_folder_profile(self):
         set_item_dialog = SetItemDialog(
             self, items=self.modloader_controller.get_profiles(),
-            checkable=False, size=[256, 256]
+            checkable=False, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             item = set_item_dialog.get_item()
@@ -142,7 +177,7 @@ class MainWindow(QMainWindow):
     def on_remove_profile(self):
         set_item_dialog = SetItemDialog(
             self, items=self.modloader_controller.get_profiles(),
-            checkable=False, size=[256, 256]
+            checkable=False, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             item = set_item_dialog.get_item()
@@ -153,13 +188,16 @@ class MainWindow(QMainWindow):
                     self.on_current_folder_profile()
                     self.on_current_profile()
 
+    def on_start_game(self):
+        print( self.gta_sa_launcher.launch() )
+
 
 # Contruir
-def build_app( modloader_controller: GTASAModloaderController ):
+def build_app( modloader_controller: GTASAModloaderController, gta_sa_launcher: GTASALauncher ):
     app = QApplication(sys.argv)
-    #app.setStyleSheet( qss_style )
+    app.setStyleSheet( qss_style )
 
-    window = MainWindow( modloader_controller )
+    window = MainWindow( modloader_controller, gta_sa_launcher )
     window.show()
 
     sys.exit( app.exec() )

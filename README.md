@@ -3,6 +3,8 @@ Un controlador del archivo de configuración `modloader.ini`. Puedes establecer 
 
 Todo; desde pioridades hasta los boleanos. Menteniendo limites lógicos, y nomenclaturas logicas para los perfiles a guardar.
 
+![image](./resources/icons/gta_sa_modloader_controller.png)
+
 ## Compilación con `pyinstaller`
 **Windows y GNU/Linux**
 ```bash

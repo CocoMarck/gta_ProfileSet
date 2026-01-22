@@ -2,6 +2,7 @@ from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloa
 
 
 # GUI
+from views.interface_number import SET_ITEM_DIALOG_SIZE
 from views.dialogs.qt import (SetItemDialog, SetPathDialog)
 
 from PyQt6 import QtWidgets, uic
@@ -72,7 +73,7 @@ class ConfigForm(QWidget):
     def on_add_parents(self):
         set_item_dialog = SetItemDialog(
             self, items=self.modloader_controller.get_profiles(),
-            checkable=True, size=[256, 256]
+            checkable=True, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             items = set_item_dialog.get_item()
@@ -83,7 +84,7 @@ class ConfigForm(QWidget):
     def on_remove_parents(self):
         set_item_dialog = SetItemDialog(
             self, items=self.profile_model.parents,
-            checkable=True, size=[256, 256]
+            checkable=True, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             items = set_item_dialog.get_item()

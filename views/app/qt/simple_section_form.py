@@ -5,6 +5,7 @@ from config.constants import (
 from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloaderController
 
 # GUI
+from views.interface_number import SET_ITEM_DIALOG_SIZE
 from views.dialogs.qt import SetItemDialog
 
 from PyQt6 import QtWidgets, uic
@@ -84,7 +85,7 @@ class SimpleSectionForm(QWidget):
 
     def on_add_filenames(self):
         set_item_dialog = SetItemDialog(
-            self, items=self.get_filenames(), checkable=True, size=[256, 256]
+            self, items=self.get_filenames(), checkable=True, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             items = set_item_dialog.get_item()
@@ -96,7 +97,7 @@ class SimpleSectionForm(QWidget):
 
     def on_remove_filenames(self):
         set_item_dialog = SetItemDialog(
-            self, items=self.get_filenames_model(), checkable=True, size=[256, 256]
+            self, items=self.get_filenames_model(), checkable=True, size=SET_ITEM_DIALOG_SIZE
         )
         if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
             items = set_item_dialog.get_item()
