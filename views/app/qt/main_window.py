@@ -124,6 +124,7 @@ class MainWindow(QMainWindow):
         self.actionSaveProfile.triggered.connect( self.on_save_profile )
         self.actionRemoveProfile.triggered.connect( self.on_remove_profile )
         self.actionStartGame.triggered.connect( self.on_start_game )
+        self.actionRenameProfile.triggered.connect( self.on_rename_profile )
 
         # Inicializar valores
         self.on_current_profile()
@@ -190,6 +191,22 @@ class MainWindow(QMainWindow):
 
     def on_start_game(self):
         print( self.gta_sa_launcher.launch() )
+
+    def on_rename_profile(self):
+        set_item_dialog = SetItemDialog(
+            self, items=self.modloader_controller.get_profiles(),
+            checkable=False, size=SET_ITEM_DIALOG_SIZE
+        )
+        if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
+            item = set_item_dialog.get_item()
+            if isinstance(item, str):
+                name, ok = QInputDialog.getText(self, 'rename-profile', 'name')
+                if name and ok:
+                    rename = self.modloader_controller.rename_profile( item, name )
+                    if rename:
+                        self.update_forms()
+                        self.on_current_folder_profile()
+                        self.on_current_profile()
 
 
 # Contruir

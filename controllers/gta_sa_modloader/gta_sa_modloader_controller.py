@@ -119,6 +119,14 @@ class GTASAModloaderController():
             self.set_and_sync_to_default_profile()
         return remove
 
+    def rename_profile(self, name, new_name):
+        rename = False
+        if isinstance(name, str) and isinstance(self.profile_model.profile, str):
+            rename = self.profile_repository.rename( name, new_name )
+        if rename:
+            self.set_and_sync_to_default_profile()
+        return rename
+
     # Boleanos
     def update_ignore_all_mods(self, value):
         update = self.profile_repository.update_ignore_all_mods(self.profile_model.profile, value)

@@ -507,7 +507,8 @@ class ProfileRepository():
         new_name = self._normalize_profile( new_name )
         rename = (
             not (new_name in profiles) and
-            new_name != self._normalize_profile(DEFAULT_PROFILE)
+            new_name != self._normalize_profile(DEFAULT_PROFILE) and
+            profile != DEFAULT_PROFILE
         )
         if rename:
             profile_line_numbers = self.get_section_line_numbers( profile ).values()

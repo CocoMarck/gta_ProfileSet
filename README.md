@@ -5,6 +5,12 @@ Todo; desde pioridades hasta los boleanos. Menteniendo limites lógicos, y nomen
 
 ![image](./resources/icons/gta_sa_modloader_controller.png)
 
+## Dependencias `GNU/Linux`
+```bash
+sudo apt update
+sudo apt install python3-pyqt6 pyqt6-dev-tools qt6-base-dev
+```
+
 ## Compilación con `pyinstaller`
 **Windows y GNU/Linux**
 ```bash

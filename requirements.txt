@@ -1,3 +1,4 @@
-PyQt6
 screeninfo
-pyside6-tools
+pyqt6
+pyqt6-dev-tools
+qt6-base-dev

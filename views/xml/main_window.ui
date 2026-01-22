@@ -11,6 +11,7 @@
                     <string>profile</string>
                 </property>
                 <addaction name="actionLoadProfile"/>
+                <addaction name="actionRenameProfile"/>
                 <addaction name="actionSaveProfile"/>
                 <addaction name="actionRemoveProfile"/>
             </widget>
@@ -23,6 +24,12 @@
         <action name="actionLoadProfile">
             <property name="text">
                 <string>load</string>
+            </property>
+        </action>
+
+        <action name="actionRenameProfile">
+            <property name="text">
+                <string>rename</string>
             </property>
         </action>
 
