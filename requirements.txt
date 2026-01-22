@@ -1,2 +1,3 @@
 PyQt6
 screeninfo
+pyside6-tools

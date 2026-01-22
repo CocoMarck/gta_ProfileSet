@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>MyApp</class>
+    <class>MainWindow</class>
 
-    <widget class="QMainWindow" name="MyApp">
+    <widget class="QMainWindow" name="MainWindow">
         <!-- Menu -->
         <widget class="QMenuBar" name="menuBar">
 

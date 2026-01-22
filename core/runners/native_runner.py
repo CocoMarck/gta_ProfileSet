@@ -14,8 +14,10 @@ class NativeRunner:
 
     def run(self):
         if self.the_file_path_is_correct():
-            instructions = [str(self.file_path)]
-            instructions.extend( self.executors )
+            instructions = []
+            for x in self.executors:
+                instructions.append( x )
+            instructions.append( str(self.file_path) )
             return subprocess.Popen(
                 instructions, cwd=self.file_path.parent
             )
