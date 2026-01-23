@@ -10,6 +10,12 @@ from repositories.gta_sa_modloader.text_repository import TextRepository
 from repositories.gta_sa_modloader.folder_repository import FolderRepository
 from repositories.gta_sa_modloader.profile_repository import ProfileRepository
 
+# Validator
+from core.validators.gta_sa_modloader_ini_validator import GTASAModloaderIniValidator
+
+# Constructor de ini
+from core.builders.gta_sa_modloader_ini_builder import GTASAModloaderIniBuilder
+
 # Log
 from utils.wrappers.log_helper import LogHelper
 
@@ -20,7 +26,7 @@ from utils.wrappers.log_helper import LogHelper
 class GTASAModloaderController():
     def __init__(
         self, folder_model: FolderModel, profile_model: ProfileModel,
-        gta_sa_dir: pathlib.Path
+        gta_sa_dir: pathlib.Path, log_level='debug', save_log=True
     ):
         self.folder_model = folder_model
         self.profile_model = profile_model
@@ -31,9 +37,15 @@ class GTASAModloaderController():
         self.folder_repository = FolderRepository( self.text_repository )
         self.profile_repository = ProfileRepository( self.text_repository )
 
+        # Validator
+        self.ini_validator = GTASAModloaderIniValidator()
+
+        # Builder
+        self.ini_builder = GTASAModloaderIniBuilder()
+
         # Log
         self.log_helper = LogHelper(
-            name="GTASAModloaderController", filename = "gta_sa_modloader_controller", verbose=True, log_level="debug", save_log=False, only_the_value=True
+            name="GTASAModloaderController", filename = "gta_sa_modloader_controller", verbose=True, log_level=log_level, save_log=save_log, only_the_value=True
         )
 
 
@@ -350,4 +362,30 @@ class GTASAModloaderController():
     # Obtener texto
     def get_ini_text(self):
         return self.text_repository.get_text()
+
+
+    def ensure_and_validate_ini(self):
+        # Craer o no ini
+        create_ini = (
+            self.path_repository.modloader_dir.is_dir() and
+            not( self.path_repository.modloader_file.is_file() )
+        )
+        if create_ini:
+            self.text_repository.write_lines( self.ini_builder.build_default() )
+
+        # Validar
+        lines = self.text_repository.get_lines()
+        self.ini_validator.lines = lines
+        validate, dict_existing_lines = self.ini_validator.validate()
+
+        for key, value in dict_existing_lines.items():
+            self.log_helper.log( f'{key} | {value} | `{lines[value]}`', 'debug' )
+        if validate:
+            self.log_helper.log( 'Validation successful | Existing lines', 'info' )
+        else:
+            self.log_helper.log( 'Validation failed | Lines do not exist', 'error' )
+
+        return validate
+
+
 
