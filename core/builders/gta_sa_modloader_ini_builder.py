@@ -1,0 +1,28 @@
+from config.constants import (
+    DOMAIN_PROFILES, DOMAIN_FOLDER, PROFILE_SECTIONS, SECTION_CONFIG, PROFILE_PARAMETER,
+    EXCLUDE_ALL_MODS_PARAMETER, IGNORE_ALL_MODS_PARAMETER, PARENTS_PARAMETER, SECTION_PRIORITY,
+    SECTION_IGNORE_MODS, SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS, DEFAULT_PROFILE, SECTION_IGNORE_FILES, EMPTY_VALUE
+)
+
+class GTASAModloaderIniBuilder:
+    def build_default(self) -> list[str]:
+        return [
+            f'[{DOMAIN_FOLDER}.{SECTION_CONFIG}]',
+            f'{PROFILE_PARAMETER}={DEFAULT_PROFILE}',
+            '',
+            f'[{DOMAIN_PROFILES}.{DEFAULT_PROFILE}.{SECTION_CONFIG}]',
+            f'{EXCLUDE_ALL_MODS_PARAMETER}=false',
+            f'{IGNORE_ALL_MODS_PARAMETER}=false',
+            f'{PARENTS_PARAMETER}={EMPTY_VALUE}',
+            '',
+            f'[{DOMAIN_PROFILES}.{DEFAULT_PROFILE}.{SECTION_PRIORITY}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{DEFAULT_PROFILE}.{SECTION_IGNORE_FILES}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{DEFAULT_PROFILE}.{SECTION_IGNORE_MODS}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{DEFAULT_PROFILE}.{SECTION_INCLUDE_MODS}]',
+            '',
+            f'[{DOMAIN_PROFILES}.{DEFAULT_PROFILE}.{SECTION_EXCLUSIVE_MODS}]',
+            '',
+        ]
