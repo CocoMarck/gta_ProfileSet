@@ -1,0 +1,15 @@
+# Python
+*.pyc
+__pycache__/
+
+# PyInsaller
+build/
+dist/
+*.spec
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Log
+*.log

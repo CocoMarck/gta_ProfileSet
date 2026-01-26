@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MainWindow</class>
+
+    <widget class="QMainWindow" name="MainWindow">
+        <!-- Menu -->
+        <widget class="QMenuBar" name="menuBar">
+
+            <widget class="QMenu" name="profileMenu">
+                <property name="title">
+                    <string>profile</string>
+                </property>
+                <addaction name="actionLoadProfile"/>
+                <addaction name="actionRenameProfile"/>
+                <addaction name="actionSaveProfile"/>
+                <addaction name="actionRemoveProfile"/>
+            </widget>
+            <addaction name="profileMenu"/>
+            <addaction name="actionReadIni"/>
+            <addaction name="actionGetMods"/>
+            <addaction name="actionSetFolderProfile"/>
+            <addaction name="actionStartGame"/>
+        </widget>
+
+        <!-- Menu actions -->
+        <action name="actionLoadProfile">
+            <property name="text">
+                <string>load</string>
+            </property>
+        </action>
+
+        <action name="actionRenameProfile">
+            <property name="text">
+                <string>rename</string>
+            </property>
+        </action>
+
+        <action name="actionReadIni">
+            <property name="text">
+                <string>read ini</string>
+            </property>
+        </action>
+
+        <action name="actionGetMods">
+            <property name="text">
+                <string>get mods</string>
+            </property>
+        </action>
+
+        <action name="actionSetFolderProfile">
+            <property name="text">
+                <string>set folder profile</string>
+            </property>
+        </action>
+
+        <action name="actionSaveProfile">
+            <property name="text">
+                <string>save</string>
+            </property>
+        </action>
+
+        <action name="actionRemoveProfile">
+            <property name="text">
+                <string>remove</string>
+            </property>
+        </action>
+
+        <action name="actionStartGame">
+            <property name="text">
+                <string>start game</string>
+            </property>
+        </action>
+
+        <!-- Contenido contundente -->
+        <widget class="QWidget" name="centralWidget">
+            <layout class="QVBoxLayout" name="mainLayout">
+                <!-- Perfil seleccionado, y perfil de folder -->
+                <item>
+                    <layout class="QHBoxLayout" name="hboxProfile">
+
+                        <item>
+                            <widget class="QLabel" name="labelLoadedProfile">
+                                <property name="text">
+                                    <string>loaded profile: </string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QLabel" name="labelCurrentProfile">
+                                <property name="text">
+                                    <string>current profile</string>
+                                </property>
+                            </widget>
+                        </item>
+
+                        <item>
+                            <widget class="QLabel" name="labelFolderProfile">
+                                <property name="text">
+                                    <string>folder profile: </string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QLabel" name="labelCurrentFolderProfile">
+                                <property name="text">
+                                    <string>current folder profile</string>
+                                </property>
+                            </widget>
+                        </item>
+
+                    </layout>
+                </item>
+
+                <!-- Seccion de widgets -->
+                <item>
+                    <widget class="QTabWidget" name="tabWidget">
+                        <!-- Tabs QWidget, no se agragan aca. Pero se puede.-->
+                    </widget>
+                </item>
+
+            </layout>
+        </widget>
+
+    </widget>
+
+    <resources/>
+    <connections/>
+</ui>
