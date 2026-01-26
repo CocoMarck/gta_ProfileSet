@@ -62,7 +62,6 @@ class SimpleSectionForm(QWidget):
             raise ValueError(f'SimpleSectionForm: bad section: {section}')
 
         # Contenido en scroll.
-        self.widget_filenames = []
 
         # Connect
         self.buttonAdd.clicked.connect( self.on_add_filenames )
@@ -74,13 +73,10 @@ class SimpleSectionForm(QWidget):
         self.set_filenames()
 
     def set_filenames(self):
-        for widget in self.widget_filenames:
-            widget.deleteLater()
-        self.widget_filenames.clear()
+        text = ""
         for name in self.get_filenames_model():
-            label = QLabel( name )
-            self.widget_filenames.append( label )
-            self.scrollVBoxLayout.addWidget( label )
+            text += f"{name}\n"
+        self.textEdit.setText( text[:-1] )
 
 
     def on_add_filenames(self):

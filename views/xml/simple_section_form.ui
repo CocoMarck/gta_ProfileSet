@@ -6,21 +6,12 @@
     <widget class="QWidget" name="centralWidget">
     <layout class="QVBoxLayout" name="mainLayout">
 
-    <!-- ScrollArea -->
+    <!-- TextEdit -->
     <item>
-    <widget class="QScrollArea" name="scrollArea">
-        <property name="widgetResizable">
+    <widget class="QTextEdit" name="textEdit">
+        <property name="readOnly">
             <bool>true</bool>
         </property>
-        <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-        </property>
-
-        <widget class="QWidget" name="scrollAreaWidgetContents">
-            <layout class="QVBoxLayout" name ="scrollVBoxLayout">
-            </layout>
-        </widget>
-
     </widget>
     </item>
 
