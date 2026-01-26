@@ -16,6 +16,9 @@ from core.validators.gta_sa_modloader_ini_validator import GTASAModloaderIniVali
 # Constructor de ini
 from core.builders.gta_sa_modloader_ini_builder import GTASAModloaderIniBuilder
 
+# Servicies
+from core.servicies.gta_sa_modloader_profile_resolver import GTASAModloaderProfileResolver
+
 # Log
 from utils.wrappers.log_helper import LogHelper
 
@@ -42,6 +45,11 @@ class GTASAModloaderController():
 
         # Builder
         self.ini_builder = GTASAModloaderIniBuilder()
+
+        # Servicies
+        self.profile_resolver = GTASAModloaderProfileResolver(
+            self.profile_repository, self.path_repository
+        )
 
         # Log
         self.log_helper = LogHelper(
@@ -363,7 +371,6 @@ class GTASAModloaderController():
     def get_ini_text(self):
         return self.text_repository.get_text()
 
-
     def ensure_and_validate_ini(self):
         # Craer o no ini
         create_ini = (
@@ -386,6 +393,27 @@ class GTASAModloaderController():
             self.log_helper.log( 'Validation failed | Lines do not exist', 'error' )
 
         return validate
+
+    def profile_exists(self, profile:str):
+        exists = self.profile_repository.exists( profile )
+        if exists:
+            self.log_helper.log( f'Profile {profile} exists', 'info' )
+        else:
+            self.log_helper.log( f'Profile {profile} not exists', 'error' )
+        return exists
+
+    def exists(self):
+        return self.profile_exists( self.profile_model.profile )
+
+    # service
+    def get_profile_mods_dir(self, profile: str):
+        if self.profile_exists( profile ):
+            self.log_helper.log( f'Get mods in profile `{profile}`', 'info' )
+            return self.profile_resolver.get_mods_dir( profile )
+        return None
+
+    def get_mods_dir(self):
+        return self.get_profile_mods_dir( self.profile_model.profile )
 
 
 

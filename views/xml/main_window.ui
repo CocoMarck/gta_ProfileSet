@@ -16,6 +16,8 @@
                 <addaction name="actionRemoveProfile"/>
             </widget>
             <addaction name="profileMenu"/>
+            <addaction name="actionReadIni"/>
+            <addaction name="actionGetMods"/>
             <addaction name="actionSetFolderProfile"/>
             <addaction name="actionStartGame"/>
         </widget>
@@ -30,6 +32,18 @@
         <action name="actionRenameProfile">
             <property name="text">
                 <string>rename</string>
+            </property>
+        </action>
+
+        <action name="actionReadIni">
+            <property name="text">
+                <string>read ini</string>
+            </property>
+        </action>
+
+        <action name="actionGetMods">
+            <property name="text">
+                <string>get mods</string>
             </property>
         </action>
 

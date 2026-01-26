@@ -569,5 +569,8 @@ class ProfileRepository():
 
         return False
 
+    def exists(self, profile:str):
+        return profile in self.get_profiles()
+
 
 

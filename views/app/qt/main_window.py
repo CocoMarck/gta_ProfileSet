@@ -8,7 +8,8 @@ from config.paths import ICON_FILE, MAIN_WINDOW_UI_FILE
 
 # Style
 from views.interface_number import (
-    WINDOW_MAIN_SIZE, SET_ITEM_DIALOG_SIZE, FONT_SIZE, MARGIN_XY, PADDING_SPACE
+    WINDOW_MAIN_SIZE, SET_ITEM_DIALOG_SIZE, FONT_SIZE, MARGIN_XY, PADDING_SPACE,
+    TEXT_EDITOR_NORMAL_SIZE, TEXT_EDITOR_SMALL_SIZE
 )
 from views.style_sheet.css_util import get_list_text_widget, text_widget_style
 FONT_FILE = "monospace"
@@ -34,7 +35,7 @@ print(qss_style)
 
 # GUI
 ## Dialogs
-from views.dialogs.qt import (SetItemDialog, SetPathDialog)
+from views.dialogs.qt import (SetItemDialog, SetPathDialog, TextEditorDialog)
 
 ## Essentals
 import sys, os
@@ -125,6 +126,8 @@ class MainWindow(QMainWindow):
         self.actionRemoveProfile.triggered.connect( self.on_remove_profile )
         self.actionStartGame.triggered.connect( self.on_start_game )
         self.actionRenameProfile.triggered.connect( self.on_rename_profile )
+        self.actionReadIni.triggered.connect( self.on_read_ini )
+        self.actionGetMods.triggered.connect( self.on_get_mods )
 
         # Inicializar valores
         self.on_current_profile()
@@ -167,8 +170,11 @@ class MainWindow(QMainWindow):
                 self.modloader_controller.set_folder_profile( item )
                 self.on_current_folder_profile()
 
-    def on_get_ini_text(self):
-        print( self.modloader_controller.get_ini_text() )
+    def on_read_ini(self):
+        dialog = TextEditorDialog(
+            text=self.modloader_controller.get_ini_text(), size=TEXT_EDITOR_NORMAL_SIZE
+        )
+        dialog.exec()
 
     def on_save_profile(self):
         name, ok = QInputDialog.getText(self, 'save-profile', 'name')
@@ -207,6 +213,24 @@ class MainWindow(QMainWindow):
                         self.update_forms()
                         self.on_current_folder_profile()
                         self.on_current_profile()
+
+    def on_get_profile_mods(self):
+        set_item_dialog = SetItemDialog(
+            self, items=self.modloader_controller.get_profiles(),
+            checkable=False, size=SET_ITEM_DIALOG_SIZE
+        )
+        if set_item_dialog.exec() == QDialog.DialogCode.Accepted:
+            item = set_item_dialog.get_item()
+            mods = str( self.modloader_controller.get_profile_mods_dir(item) )
+            dialog = TextEditorDialog( text=mods )
+            dialog.exec()
+
+    def on_get_mods(self):
+        mods_text = ""
+        for m in self.modloader_controller.get_mods_dir():
+            mods_text += f"{m}\n"
+        dialog = TextEditorDialog( text=mods_text[:-1], size=TEXT_EDITOR_SMALL_SIZE )
+        dialog.exec()
 
 
 # Contruir
