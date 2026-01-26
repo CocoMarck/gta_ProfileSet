@@ -1,33 +1,23 @@
-# gtaProfileSet
-Un launcher que te permite cambiar parametros del modloader.ini
-Esta aplicación permite la gestión de mods de manera mas visual y rapida.
+# GTA SA Modloader Controller
+Un controlador del archivo de configuración `modloader.ini`. Puedes establecer perfil, configurar secciones de perfiles, crear perfiles, remover perfiles. 
 
-### Dependencias para compilación
-[Lista de las dependencias necesarias] (dependencies.txt)
+Todo; desde pioridades hasta los boleanos. Menteniendo limites lógicos, y nomenclaturas logicas para los perfiles a guardar.
 
-### Como compilar
-- Cliente de consola (Windows)
-```
-pyinstaller --onefile --console --uac-admin --icon=.\gta_ProfileSet.ico .\gta_ProfileSet_shell.py
-pyinstaller --console --icon=.\resources\gta_ProfileSet.ico .\gta_ProfileSet_shell.py
-```
+![image](./resources/icons/gta_sa_modloader_controller.png)
 
-- Cliente con interfaz (Windows) 
-```
-pyinstaller --windowed --icon=.\resources\gta_ProfileSet.ico .\gta_ProfileSet_Qt.py
+## Dependencias `GNU/Linux`
+```bash
+sudo apt update
+sudo apt install python3-pyqt6 pyqt6-dev-tools qt6-base-dev
 ```
 
-- gta with parameters (Windows)
-```
-pyinstaller --console --icon=.\resources\gta_ProfileSet.ico .\gta_withparameters.py
-```
-
-- Cliente con interfaz (Linux)
-```
-pyinstaller --onefile ./gta_ProfileSet_Qt.py
+## Compilación con `pyinstaller`
+**Windows y GNU/Linux**
+```bash
+pyinstaller --windowed --icon="./resources/icons/gta_sa_modloader_controller.png" "./main.py"
 ```
 
-- Borrar lo demas
-```
-del *.spec
-```
+## Uso
+Si ya tienes tu modloader configurado, haz un backup de tu `modloader.ini`. Copy, Paste, and Raneme; Like `modloader_backup.ini`.
+
+Pon el programa dentro del directorio de tu gta sa, con el `modloader\modloader.ini` ya existente. Ejecutalo, y usa permisos de admnistrador si tienes el juego en ruta admin. Como por ejemplo `C:\ProgramFiles*`.
