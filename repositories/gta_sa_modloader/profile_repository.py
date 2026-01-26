@@ -34,7 +34,7 @@ class ProfileRepository():
                 profile = text_line.split('.')
                 if profile[2] == 'Config':
                     profiles.append( profile[1] )
-        return abc_list(profiles) # En orden abecadario
+        return sorted(profiles) # En orden abecadario
 
     # Insartar o acutalizar datos en sección de perfil
     def get_section_line_numbers( self, profile: str ):

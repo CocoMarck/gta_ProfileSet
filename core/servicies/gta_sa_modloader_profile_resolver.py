@@ -1,5 +1,6 @@
 from repositories.gta_sa_modloader.profile_repository import ProfileRepository
 from repositories.gta_sa_modloader.path_repository import PathRepository
+from core.text_util import not_repeat_item, abc_list
 import pathlib
 
 class GTASAModloaderProfileResolver:
@@ -53,9 +54,10 @@ class GTASAModloaderProfileResolver:
 
         # Retornar mods en profile, o todos
         if exclude_all_mods or ignore_all_mods:
-            return mod_file_names
+            return sorted( not_repeat_item( mod_file_names ) )
         else:
             files = []
             for f in self.path_repository.get_mod_files():
                 files.append( f.name )
-            return files
+
+            return sorted( not_repeat_item( files ) )
