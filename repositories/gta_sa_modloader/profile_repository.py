@@ -132,7 +132,7 @@ class ProfileRepository():
         '''
         final_text_lines = []
         final_text_lines.extend( dict_values_section['first_lines'] )
-        final_text_lines.extend( abc_list(dict_values_section['line_values']) ) # Ordenar en abecadrio
+        final_text_lines.extend( sorted(dict_values_section['line_values']) ) # Ordenar en abecadrio
         final_text_lines.append( '' )
         final_text_lines.extend( dict_values_section['last_lines'] )
 
