@@ -109,6 +109,14 @@ class GTASAModloaderController():
         '''
         self.folder_model.profile = self.folder_repository.get_profile()
 
+    def profile_exists(self, profile:str):
+        exists = self.profile_repository.exists( profile )
+        if exists:
+            self.log_helper.log( f'Profile `{profile}` exists', 'info' )
+        else:
+            self.log_helper.log( f'Profile `{profile}` not exists', 'error' )
+        return exists
+
     def set_folder_profile(self, name):
         write = False
         if name in self.profile_repository.get_profiles():
@@ -123,7 +131,10 @@ class GTASAModloaderController():
     # Otros
     def sync_active_profile(self):
         self.load_folder_profile()
-        self.profile_model.profile = self.folder_model.profile
+        if self.profile_repository.exists(self.folder_model.profile):
+            self.profile_model.profile = self.folder_model.profile
+        else:
+            self.profile_model.profile = DEFAULT_PROFILE
         self.load_profile()
 
     def set_and_sync_to_default_profile(self):
@@ -132,8 +143,17 @@ class GTASAModloaderController():
 
     # Seleccionar perfil
     def select_profile(self, name):
-        self.profile_model.profile = name
-        self.load_profile()
+        exists = self.profile_repository.exists( name )
+        if exists:
+            self.profile_model.profile = name
+            self.load_profile()
+            self.log_helper.log( f'Loading profile `{name}`', 'info' )
+        else:
+            self.log_helper.log(
+                f"That profile doesn't exists `{name}` | Keeping `{self.profile_model.profile}`",
+                'warning'
+            )
+        return exists
 
     # Guardar nuevo perfil
     def save_profile(self, name):
@@ -393,14 +413,6 @@ class GTASAModloaderController():
             self.log_helper.log( 'Validation failed | Lines do not exist', 'error' )
 
         return validate
-
-    def profile_exists(self, profile:str):
-        exists = self.profile_repository.exists( profile )
-        if exists:
-            self.log_helper.log( f'Profile {profile} exists', 'info' )
-        else:
-            self.log_helper.log( f'Profile {profile} not exists', 'error' )
-        return exists
 
     def exists(self):
         return self.profile_exists( self.profile_model.profile )
