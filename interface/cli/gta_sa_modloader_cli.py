@@ -1,8 +1,10 @@
 from controllers.gta_sa_modloader.gta_sa_modloader_controller import GTASAModloaderController
 from core.launcher.gta_sa_launcher import GTASALauncher
 from config.constants import (
-    SECTION_CONFIG, SECTION_PRIORITY, SECTION_IGNORE_FILES,
-    SECTION_IGNORE_MODS, SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS
+    SECTION_PRIORITY, SECTION_IGNORE_FILES,
+    SECTION_IGNORE_MODS, SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS,
+    IGNORE_ALL_MODS_PARAMETER, EXCLUDE_ALL_MODS_PARAMETER, PARENTS_PARAMETER,
+    PROFILE_CONFIG_PARAMETERS
 )
 import argparse
 
@@ -25,21 +27,26 @@ class GTASAModloaderCLI:
         self.parser.add_argument(
             '-p', '--profile', help='Selected profile'
         )
-        self.parser.add_argument(
-            '-l', '--load', help='Load profile'
-        )
+
+        # Need profile
         self.parser.add_argument(
             '-gs', '--get-section', help='Get section in profile'
         )
         self.parser.add_argument(
-            '-rn', '--raname', help='Reneme existing profile'
+            '-gas', '--get-all-sections', action='store_true', help='Get all section in profile'
         )
         self.parser.add_argument(
-            '-rm', '--remove', help='Remove existing profile'
+            '-gcp', '--get-config-parameter', help='Get config parameter in profile'
         )
         self.parser.add_argument(
-            '-s', '--save', help='Save profile'
+            '-gacp', '--get-all-config-parameters', action='store_true',
+            help='Get all config parameters in profile'
         )
+
+        ## Modificaciones potentes.
+        ## `--save, --remove, --rename, --save_in_section, --mods`. Por ahora evitar.
+
+        # Bools, need NOTHING
         self.parser.add_argument(
             '-lg', '--launch-game', action='store_true', help='Run the game'
         )
@@ -61,6 +68,15 @@ class GTASAModloaderCLI:
             return self.profile_model.exclusive_mods
         raise RuntimeError('That section does not exists')
 
+    def get_config_parameter(self, parameter: str):
+        if parameter == IGNORE_ALL_MODS_PARAMETER:
+            return self.profile_model.ignore_all_mods
+        if parameter == EXCLUDE_ALL_MODS_PARAMETER:
+            return self.profile_model.exclude_all_mods
+        if parameter == PARENTS_PARAMETER:
+            return self.profile_model.parents
+        raise RuntimeError('That parameter does not exists')
+
 
     def run(self):
         args = self.parser.parse_args()
@@ -71,19 +87,29 @@ class GTASAModloaderCLI:
         if args.get_profiles:
             print( self.modloader_controller.get_profiles() )
         if args.launch_game:
-            self.gta_sa_launcher.launch()
+            print( self.gta_sa_launcher.launch() )
 
-        if isinstance(args.get_section, str):
-            print( self.get_section( args.get_section ) )
-
+        # Se indico un perfil
         if isinstance(args.profile, str):
-            if isinstance(args.load_profile, str):
-                self.modloader_controller.load_profile( args.profile )
+            if args.get_all_config_parameters:
+                self.modloader_controller.select_profile( args.profile )
+                for x in PROFILE_CONFIG_PARAMETERS:
+                    print( f"{x}:", self.get_config_parameter(x) )
+            if args.get_all_sections:
+                self.modloader_controller.select_profile( args.profile )
+                for x in (
+                    SECTION_PRIORITY, SECTION_IGNORE_FILES, SECTION_IGNORE_MODS, SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS
+                ):
+                    print( f"{x}:", self.get_section(x) )
 
-            if args.rename:
-                self.modloader_controller.raname_profile( args.profile, args.rename )
-            if args.remove:
-                self.modloader_controller.remove_profile( args.profile )
-            if args.save:
-                self.modloader_controller.save_profile( args.profile )
+
+            if isinstance(args.get_config_parameter, str):
+                self.modloader_controller.select_profile( args.profile )
+                print(
+                    f"{args.get_config_parameter}:",
+                    self.get_config_parameter(args.get_config_parameter)
+                )
+            if isinstance(args.get_section, str):
+                self.modloader_controller.select_profile( args.profile )
+                print( f"{args.get_section}:", self.get_section(args.get_section) )
 
