@@ -42,6 +42,9 @@ class GTASAModloaderCLI:
             '-gacp', '--get-all-config-parameters', action='store_true',
             help='Get all config parameters in profile'
         )
+        self.parser.add_argument(
+            '-gm', '--get-mods', action='store_true', help='Get mods'
+        )
 
         ## Modificaciones potentes.
         ## `--save, --remove, --rename, --save_in_section, --mods`. Por ahora evitar.
@@ -101,6 +104,8 @@ class GTASAModloaderCLI:
                     SECTION_PRIORITY, SECTION_IGNORE_FILES, SECTION_IGNORE_MODS, SECTION_INCLUDE_MODS, SECTION_EXCLUSIVE_MODS
                 ):
                     print( f"{x}:", self.get_section(x) )
+            if args.get_mods:
+                print( self.modloader_controller.get_profile_mods_dir(args.profile) )
 
 
             if isinstance(args.get_config_parameter, str):

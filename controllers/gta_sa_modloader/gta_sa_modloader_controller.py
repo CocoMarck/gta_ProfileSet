@@ -112,9 +112,9 @@ class GTASAModloaderController():
     def profile_exists(self, profile:str):
         exists = self.profile_repository.exists( profile )
         if exists:
-            self.log_helper.log( f'Profile {profile} exists', 'info' )
+            self.log_helper.log( f'Profile `{profile}` exists', 'info' )
         else:
-            self.log_helper.log( f'Profile {profile} not exists', 'error' )
+            self.log_helper.log( f'Profile `{profile}` not exists', 'error' )
         return exists
 
     def set_folder_profile(self, name):
