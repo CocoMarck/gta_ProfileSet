@@ -381,7 +381,7 @@ class GTASAModloaderController():
 
     ## Mod Files, and Directorys
     def get_mod_file_names(self):
-        return [f.name for f in self.path_repository.get_mod_files()]
+        return list( set([f.name for f in self.path_repository.get_mod_files()]) )
 
     def get_mod_dir_names(self):
         return [d.name for d in self.path_repository.get_mod_dirs()]
