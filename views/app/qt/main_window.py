@@ -232,6 +232,10 @@ class MainWindow(QMainWindow):
         dialog = TextEditorDialog( text=mods_text[:-1], size=TEXT_EDITOR_SMALL_SIZE )
         dialog.exec()
 
+    def closeEvent(self, event):
+        self.gta_sa_launcher.stop()
+        event.accept()
+
 
 # Contruir
 def build_app( modloader_controller: GTASAModloaderController, gta_sa_launcher: GTASALauncher ):
