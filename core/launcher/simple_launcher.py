@@ -24,3 +24,4 @@ class SimpleLauncher:
     def stop(self):
         if self.runner:
             self.runner.stop()
+            self.runner = None

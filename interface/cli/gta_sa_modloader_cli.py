@@ -22,28 +22,28 @@ class GTASAModloaderCLI:
         # Parser
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument(
-            '-sfp', '--set-folder-profile', help='Set folder profile'
+            '-sfp', '--set-folder-profile', help='set folder profile'
         )
         self.parser.add_argument(
-            '-p', '--profile', help='Selected profile'
+            '-p', '--profile', help='selected profile'
         )
 
         # Need profile
         self.parser.add_argument(
-            '-gs', '--get-section', help='Get section in profile'
+            '-gs', '--get-section', help='get section in profile'
         )
         self.parser.add_argument(
-            '-gas', '--get-all-sections', action='store_true', help='Get all section in profile'
+            '-gas', '--get-all-sections', action='store_true', help='get all section in profile'
         )
         self.parser.add_argument(
-            '-gcp', '--get-config-parameter', help='Get config parameter in profile'
+            '-gcp', '--get-config-parameter', help='get config parameter in profile'
         )
         self.parser.add_argument(
             '-gacp', '--get-all-config-parameters', action='store_true',
-            help='Get all config parameters in profile'
+            help='get all config parameters in profile'
         )
         self.parser.add_argument(
-            '-gm', '--get-mods', action='store_true', help='Get mods'
+            '-gm', '--get-mods', action='store_true', help='get mods'
         )
 
         ## Modificaciones potentes.
@@ -51,10 +51,10 @@ class GTASAModloaderCLI:
 
         # Bools, need NOTHING
         self.parser.add_argument(
-            '-lg', '--launch-game', action='store_true', help='Run the game'
+            '-lg', '--launch-game', action='store_true', help='run the game'
         )
         self.parser.add_argument(
-            '-gp', '--get-profiles', action='store_true', help='Get all profiles'
+            '-gp', '--get-profiles', action='store_true', help='get all profiles'
         )
 
 

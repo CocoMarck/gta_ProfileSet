@@ -196,6 +196,7 @@ class MainWindow(QMainWindow):
                     self.on_current_profile()
 
     def on_start_game(self):
+        self.gta_sa_launcher.stop()
         print( self.gta_sa_launcher.launch() )
 
     def on_rename_profile(self):

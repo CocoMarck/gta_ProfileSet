@@ -42,6 +42,6 @@ class NativeRunner:
     def stop(self):
         if self.is_running():
             try:
-                os.killpg(self.process, signal.SIGKILL)
+                os.killpg(self.process.pid, signal.SIGKILL)
             except Exception:
                 pass
