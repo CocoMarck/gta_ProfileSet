@@ -14,7 +14,7 @@ sudo apt install python3-pyqt6 pyqt6-dev-tools qt6-base-dev
 ## Compilación con `pyinstaller`
 **Windows y GNU/Linux**
 ```bash
-pyinstaller --windowed --icon="./resources/icons/gta_sa_modloader_controller.png" "./main.py"
+pyinstaller --windowed --icon="./resources/icons/gta_sa_modloader_controller.png" --name "gta_sa_modloader_controller" "./main.py"
 ```
 
 ## Uso

@@ -6,6 +6,8 @@ __pycache__/
 build/
 dist/
 *.spec
+*.7z
+releases/
 
 # OS
 .DS_Store
