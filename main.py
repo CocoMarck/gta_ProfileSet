@@ -1,3 +1,6 @@
+# Python
+import atexit
+
 # App
 from views.app.qt.main_window import build_app
 
@@ -16,6 +19,7 @@ modloader_controller = GTASAModloaderController( folder_model, profile_model, GT
 
 # Launcher
 gta_sa_launcher = GTASALauncher( GTA_SA_DIR )
+atexit.register(gta_sa_launcher.stop)
 
 
 # Contruir app
@@ -33,6 +37,3 @@ if __name__ == '__main__':
             'The `modloader.ini` file is invalid or incomplete.'
         )
         sys.exit(1)
-
-
-
